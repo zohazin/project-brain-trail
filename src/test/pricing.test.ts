@@ -19,3 +19,12 @@ describe("Bring it back pricing", () => {
     expect(costFor("return", 500, 1, 2)).toBe(1000);
   });
 });
+
+describe("Decimal-safe supply totals", () => {
+  it("250 g at Rs 80 per 100 g is exactly Rs 200", () => {
+    expect(costFor("use_up", 80, 100, 250)).toBe(200);
+  });
+  it("0.1 + 0.2 style amounts don't drift: 0.3 kg at Rs 10 per 0.1 kg is Rs 30", () => {
+    expect(costFor("use_up", 10, 0.1, 0.3)).toBe(30);
+  });
+});

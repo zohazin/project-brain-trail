@@ -186,6 +186,19 @@ export function unsureContact(text: string): string | null {
   return null;
 }
 
+/**
+ * Delete-only: drops a clause whose private detail was hidden and that only asked to call, message or visit,
+ * or said who the person is ("Main [hidden] hoon", "[hidden] pe call karein", "ghar [hidden] mein hai").
+ * Otherwise the owner would get an empty "please call me" with nothing to call.
+ */
+const CONTACT_CLAUSE = /\b(call|phone|fone|number|nambar|whats ?app|sms|text|message|msg|contact|rabta|email|e-mail|ghar|house|address|pata|rehta|rehti|naam|name|hoon|hun|i am|i'm|mera|meri|my)\b/i;
+export function dropContactClauses(note: string): string {
+  const parts = note.split(/(?<=[,.;!?،۔؟])\s+/);
+  const kept = parts.filter((c) => !(c.includes("[hidden]") && CONTACT_CLAUSE.test(c)));
+  const out = kept.join(" ").trim();
+  return out || note;
+}
+
 const core = (w: string) => normalizeDigits(w).replace(/[^\p{L}\p{N}]/gu, "").toLowerCase();
 
 /**

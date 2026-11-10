@@ -2,7 +2,7 @@
 // It protects the original: it may only hide or delete private details, never add or reorder the person's words.
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { hasPrivate, privateWords, scrubPrivate, unsureContact } from "./shayari";
+import { dropContactClauses, hasPrivate, privateWords, scrubPrivate, unsureContact } from "./shayari";
 
 export type SafeNote =
   | { ok: true; note: string; removed: boolean; secrets: string[] }
@@ -24,7 +24,7 @@ export async function safeNote(text: string, secrets: string[]): Promise<SafeNot
   let aiRemoved = false;
   try {
     const r = await ai.anonymizeNote(pre);
-    note = scrubPrivate(r.note, secrets).trim();
+    note = dropContactClauses(scrubPrivate(r.note, secrets).trim());
     aiRemoved = r.removed;
   } catch (e) {
     if (e instanceof ai.AiUnavailableError) return { ok: false, aiError: e.message, retryAfter: e.retryAfter };

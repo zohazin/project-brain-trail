@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasPrivate, onlySourceWords, privateWords, scrubPrivate, unsureContact } from "@/lib/shayari";
+import { dropContactClauses, hasPrivate, onlySourceWords, privateWords, scrubPrivate, unsureContact } from "@/lib/shayari";
 import { karachiAt } from "@/lib/demo";
 
 const ALI = privateWords(["Ali (Demo borrower)", "Gulgasht Colony", null, "ali.demo@cheezudhaar.test", "ali.demo"]);
@@ -87,5 +87,19 @@ describe("rhyme facts: numbers written as words", () => {
   it("still refuses a number that is neither written nor spoken in the message", async () => {
     const { numberProblems } = await import("@/lib/shayari");
     expect(numberProblems("budget zero hai", { lines: ["a", "b"], meaning: "budget 500" })).toHaveLength(1);
+  });
+});
+
+describe("hidden contact clauses are dropped (delete-only)", () => {
+  it("removes 'call me on [hidden]' and 'I am [hidden]' but keeps the need", () => {
+    expect(dropContactClauses("Main [hidden] hoon, [hidden] pe call karein, ghar [hidden] mein hai. Tent sirf 2 raaton ke liye chahiye, Sunday ko wapas kar dunga.")).toBe(
+      "Tent sirf 2 raaton ke liye chahiye, Sunday ko wapas kar dunga.",
+    );
+  });
+  it("keeps clauses without hidden details untouched", () => {
+    expect(dropContactClauses("Tent 2 raaton ke liye chahiye, please call karna zaroori nahi.")).toBe("Tent 2 raaton ke liye chahiye, please call karna zaroori nahi.");
+  });
+  it("never returns an empty note", () => {
+    expect(dropContactClauses("[hidden] pe call karein.")).toBe("[hidden] pe call karein.");
   });
 });

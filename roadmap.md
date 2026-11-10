@@ -100,7 +100,7 @@
 - [x] B2. Two demo borrowers race for one fictional item — only one wins; loser sees clear message + replacement
 - [x] C. Full five-glue-gun run across every owner (live AI): 3+2 → decline → replacement 2 → pickups 5, partial return, owed shown, completed, 2 rhymes, 2 ratings
 - [x] D. Normal member end-to-end: setup + manual area, drill listing + photo, edit, pause/resume, live AI request, yes, chat, meeting, pickup/return confirmed, both reviews; no demo items seen (signup email not sent: test accounts made directly)
-- [ ] E. Request edits + generation reuse; 250 g × Rs 80/100 g = Rs 200
+- [x] E. Request edits: quantity, free→paid, distance (typed distance now sticks), dates, new must-have, reload during creation — reuse first, one creation per version; 250 g × Rs 80/100 g = Rs 200 (app + database)
 - [ ] F. Shayari three entry points re-check
 - [ ] G. Network/account recovery checks
 - [ ] H. Phone layout + PWA checks

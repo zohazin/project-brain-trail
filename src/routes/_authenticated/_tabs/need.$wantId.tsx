@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { CalendarClock, Check, ChevronRight, Feather, MapPin, MapPinned, SendHorizontal, Sparkles } from "lucide-react";
 import { ShayariPanel } from "@/components/app/Shayari";
@@ -97,7 +97,9 @@ function Conversation({ want }: { want: Want }) {
         clearAnswer();
         if (r.plan) qc.setQueryData(["plan", want.id, r.plan.km], { ok: true, plan: r.plan });
         if ("change" in r) setChange(r.change ?? null);
-        if (want.status === "ready") qc.removeQueries({ queryKey: ["plan", want.id] });
+        // Load the saved request first (its distance may have changed), then drop older plans.
+        await qc.invalidateQueries({ queryKey: ["want", want.id] });
+        if (want.status === "ready") qc.removeQueries({ queryKey: ["plan", want.id], predicate: (q) => q.queryKey[2] !== r.plan?.km });
       }
       await qc.invalidateQueries({ queryKey: ["want", want.id] });
     } catch (err) {
@@ -264,7 +266,11 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
   const qc = useQueryClient();
   const planFn = useServerFn(planForWant);
   const { data: profile } = useQuery(profileQuery(want.borrower_id));
-  const [km, setKm] = useState(Number(want.search_km));
+  // The saved search distance leads; the picker overrides it until the saved one changes
+  // (e.g. the person typed "10 km ke andar" in the conversation).
+  const [pickedKm, setKm] = useState<number | null>(null);
+  useEffect(() => setKm(null), [want.search_km]);
+  const km = pickedKm ?? Number(want.search_km);
   const [wider, setWider] = useState(false);
   const [savingKm, setSavingKm] = useState(false);
   const usualKm = profile ? Number(profile.travel_km) : null;
