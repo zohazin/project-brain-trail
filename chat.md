@@ -17,7 +17,20 @@ Central reference for project context. Read this first in every session; update 
   - Any real members, their records and uploaded photos from the old project (old chat.md says test accounts were removed; a data export would be needed if real members existed).
   - Old project's published address, email sender name and settings — this copy needs its own publish; sign-up emails will use this project's name.
 - Reported error `src/pages/NotFound.tsx(13,21) TS2741 'children' missing`: **that file/folder does not exist** in the zip or this project (TanStack Start has no `src/pages`); build/type check is clean. Nothing to fix (same as earlier NotFound/App.tsx/main.tsx reports).
-- Not tested in this copy: full multi-account booking walkthrough, email delivery, Shayari rhymes live, real phone install/GPS.
+- Not tested in this copy: email delivery, real phone install/GPS. (Shayari live tests and the Find chair walkthrough were done 2026-11-10 — see "AI billing check" below.)
+- **Published 2026-11-10: https://project-brain-trail.lovable.app** (returned 200 with the Cheez Udhaar title).
+
+## AI billing check + blocked live tests (request7618.txt, 2026-11-10)
+- Reported `src/App.tsx(14,10) 'filterValue'` error: **file does not exist** (no src/App.tsx in TanStack Start); build OK. Not applicable.
+- Workspace paying for this project's AI: **this project's own workspace** (Free plan, unified credits — one balance for building, Cloud and AI). AI-spendable at start: 23.90 credits (5 daily + 20 bonus credits, bonus expires 10 Nov 2027); after all tests: 21.96. The earlier 402 belonged to the **original project's** workspace, not this one. The purchase on the user's other account is **not visible here** and was not needed.
+- **No workspace move done** — not needed, because this workspace already funds AI. Recorded anyway: project ID 6e59eae0-8bfb-41e2-8a74-800d6989a0b5; backend = this project's own Lovable Cloud; server secrets (names only): LOVABLE_API_KEY (managed), LOVABLE_CRON_SECRET; no other connectors; email = default Lovable sender, link-based confirm (no custom email domain).
+- Small authenticated runtime check (admin Zainab → Admin → "Run live check"): **Working**, HTTP 200, provider OpenAI via Lovable AI, model openai/gpt-6-astra. All 28+ AI calls during the tests returned 200; no 402.
+- Live tests (separate demo accounts, normal screens, desktop 1280 px):
+  - DM: Ali typed "Kal shaam 5 baje projector le sakta hoon?" → Urdu rhyme; meaning kept Ali asking permission ("کیا میں کل شام 5 بجے پروجیکٹر لے سکتا ہوں؟"); Usman saw the same rhyme; original saved with it. PASS
+  - Faraway: real Find search for a camping tent → none within 5 km → 10 km → exception card; note with name, phone, house address → shown as [hidden]; fresh Urdu rhyme; sent; Farah sees "Anonymous borrower", rhyme + meaning, "Allow the distance" first; no name/phone/address leaked. PASS (request left waiting for Farah.)
+  - Thank-you: Ali returned the last chair, Sara confirmed "All 12 folding chairs are back" → Roman Urdu thank-you rhyme → Sara sees the Thank-you card. PASS
+  - Find: fresh "20 folding chairs, Sunday 1 baje" → AI asked "Wapas kab karenge?" → answered 6 PM → plan Owner A 12 + Owner B 8 (free), 4 PM owner "not a fit" → sent 2 → Sara yes, Usman no → "Owner C" (Hina) 8 offered → approved → Hina yes → "All 20 confirmed". No duplicate requests. PASS
+- No code changes were needed. 86/86 automatic tests pass; build OK.
 
 ## Purpose / Overview
 - App name: **Cheez Udhaar** — mobile-first app to borrow and lend things nearby. Starts with one community in **Multan**. One account can both borrow and lend.
@@ -166,7 +179,7 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 
 ## Task Status
 - Completed: phases 1–4 in roadmap.md.
-- Import into this project: done (see Current status). Pending: demo item photos (need the photo files), real-member data (only if the old app had real members — needs an export), publish this copy.
+- Import into this project: done (see Current status). Pending: demo item photos (need the photo files), real-member data (only if the old app had real members — needs an export). This copy is published.
 - Pending / needs user: email domain for a typed code; push notifications; physical-phone checks after publishing.
 
 ## Next Steps
@@ -203,6 +216,7 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 | AGENTS.md | Technical rules |
 | lovable-36845aad-2026-11-10.zip | Full export of the original Cheez Udhaar project; imported into this project 2026-11-10 |
 | query5371.txt | Instruction: import the whole zip 100% (plus a NotFound.tsx error line that doesn't apply) |
+| request7618.txt | Fix AI 402 billing blocker (check workspace, move only if needed), live check, four live Shayari/Find tests, publish, hand off |
 
 ## Change History
 - 2026-11-09: chat.md created; no project files received yet.
@@ -215,4 +229,5 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 - 2026-11-10 (later): Reported `src/lib/utils.ts(4,16) React.theme` error not present — file has no `React.theme`; typecheck clean. Fixed leftover: faraway-note cleaner could add words ("Meherbani hogi"); now only deletes (`onlySourceWords` in `src/lib/shayari.ts`, used by `anonymizeNote`). Live check: name/phone/address → [hidden], no added words. 52/52 tests pass.
 - 2026-11-10 (evening): instruction2315.txt (Mystery Card verification pass). Reported `src/pages/Index.tsx` error not applicable (no `src/pages` folder). Built: shared anonymity cleaning `safeNote` for plain faraway notes and rhymes (+92/spaces/brackets/Urdu digits, emails, @handles, links, house numbers; asks to edit when unsure; delete-only in the person's order); backend refuses closed searches, re-use of a rhyme in another chat, and hides the sender's first name in plain notes; "budget zero" no longer fails; display polish (labelled columns, quieter meaning, "Show original message" button, "Couldn't make a rhyme"/"Ready to send"); one-tap "Prepare Shayari demo" + "Shayari demo" guide. Tested: 71 automated checks, 18 backend permission/privacy checks, browser chat/return/thank-you flows at desktop and 390 px. Blocked: AI balance ran out (402) mid-testing, so live rhymes on the faraway screen and the Find → plan regression are untested. Remaining: top up AI balance and re-run those; real-phone check.
 - 2026-11-10 (night): instruction4794.txt (AI reliability). Reported `src/App.tsx(20,8)` error not applicable (no src/App.tsx). Runtime AI: Lovable AI Gateway, model openai/gpt-6-astra (all features). Blocker: workspace AI balance 0 (Free plan; live probe → payment_required 402); builder had 4.70 daily credits. Built: speaker/act/negation/condition rules in writer + checker, fixed checks (`intentProblems`, `rhymeProblems`), rhyme re-use checked before any AI call and keyed on booking facts, 600-letter rhyme limit, output-token limits, no automatic resend on timeout/server error, failure kinds with Retry-After countdown, simple member wording, admin "Writing helper status" card (`ai_events`). Tested: 86 automated checks, typecheck, screen check of failure state (390 px) and admin card. Blocked (needs AI balance): live speaker-preservation rhymes, live faraway rhyme, live thank-you rhyme, Find → plan regression, cheaper-model evaluation.
+- 2026-11-10 (late): request7618.txt — AI billing checked (this workspace funds AI; no move needed), live check 200, four live tests PASS, published to https://project-brain-trail.lovable.app. App.tsx error not applicable.
 - 2026-11-10 (import): New project created from lovable-36845aad-2026-11-10.zip per query5371.txt. All code copied unchanged; new Lovable Cloud backend; 14 database steps re-applied identically; photos storage, email sign-in, hourly job, AI working; 86/86 tests; demo sign-in + Find + live AI question checked. Not carried: demo photos, any real member data. NotFound.tsx error not applicable (file absent). Earlier minimal chat.md from this project (working rules only) merged into this file.

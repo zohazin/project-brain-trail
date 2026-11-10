@@ -56,7 +56,7 @@
 - [x] "budget zero" no longer fails the number check
 - [x] Shayari demo section + "Prepare Shayari demo"
 - [x] Tests (71) and backend permission checks
-- [ ] Live rhyme checks for the faraway screen and remaining languages (needs AI balance topped up)
+- [x] Live rhyme checks for the faraway screen (Urdu) and Roman Urdu thank-you (2026-11-10)
 - [ ] Publish (done by agent if available) and check on a real phone
 
 ## AI reliability (instruction4794.txt)
@@ -64,7 +64,8 @@
 - [x] Speaker/intent/negation/condition preservation (prompt + fixed checks + checker)
 - [x] Cost: re-use before AI calls, facts in re-use key, input/output limits, no auto-resend
 - [x] Failure UI (unavailable/busy/timeout/invalid/balance) + admin status card
-- [ ] Live retests A–D and model comparison — blocked: workspace AI balance is 0
+- [x] Live retests A–D (2026-11-10, this project)
+- [ ] Cheaper-model comparison (optional, not requested again)
 - [ ] Physical-phone checks — needs a real phone
 
 ## Import into this project (lovable-36845aad-2026-11-10.zip, query5371.txt) — 2026-11-10
@@ -72,11 +73,11 @@
 - [x] Checks: 86 tests, build, demo sign-in, Find list, live AI question
 - [ ] Demo item photos (files not in the zip — need them, or skip)
 - [ ] Real member data from the old app (only if any existed — needs an export, or skip)
-- [ ] Publish this copy
+- [x] Publish this copy (https://project-brain-trail.lovable.app)
 
 ## AI billing blocker + blocked live tests (request7618.txt) — 2026-11-10
-- [ ] 1. Identify workspace paying for runtime AI (unified credits?) and whether a move is needed
-- [ ] 2. Move workspace only if this one can't fund AI (record project/backend/secrets/email first)
-- [ ] 3. One small authenticated runtime AI request (status, provider, model)
-- [ ] 4. Live tests: DM rhyme, faraway (exception) rhyme, thank-you rhyme, Find chair + replacement
-- [ ] 5. Checks, publish, hand off
+- [x] 1. Workspace paying for AI = this project's own workspace (unified credits, funded)
+- [x] 2. Move not needed (details recorded in chat.md)
+- [x] 3. Live check: 200, openai/gpt-6-astra
+- [x] 4. Live tests: DM, faraway, thank-you, Find chair + replacement — all PASS
+- [x] 5. Tests 86/86, published
