@@ -103,3 +103,12 @@ describe("hidden contact clauses are dropped (delete-only)", () => {
     expect(dropContactClauses("[hidden] pe call karein.")).toBe("[hidden] pe call karein.");
   });
 });
+
+describe("mostly hidden clauses", () => {
+  it("drops '[hidden] mein hai.' left after hiding an address", () => {
+    expect(dropContactClauses("[hidden] mein hai. Tent sirf 2 raaton ke liye chahiye.")).toBe("Tent sirf 2 raaton ke liye chahiye.");
+  });
+  it("keeps a real need that only mentions a hidden word", () => {
+    expect(dropContactClauses("Tent [hidden] ke school trip ke liye chahiye.")).toBe("Tent [hidden] ke school trip ke liye chahiye.");
+  });
+});

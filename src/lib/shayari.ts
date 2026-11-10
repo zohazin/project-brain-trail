@@ -194,7 +194,9 @@ export function unsureContact(text: string): string | null {
 const CONTACT_CLAUSE = /\b(call|phone|fone|number|nambar|whats ?app|sms|text|message|msg|contact|rabta|email|e-mail|ghar|house|address|pata|rehta|rehti|naam|name|hoon|hun|i am|i'm|mera|meri|my)\b/i;
 export function dropContactClauses(note: string): string {
   const parts = note.split(/(?<=[,.;!?،۔؟])\s+/);
-  const kept = parts.filter((c) => !(c.includes("[hidden]") && CONTACT_CLAUSE.test(c)));
+  const leftWords = (c: string) => c.replace(/\[hidden\]/g, " ").split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+  // A clause that is mostly hidden ("[hidden] mein hai.") says nothing once its detail is gone.
+  const kept = parts.filter((c) => !(c.includes("[hidden]") && (CONTACT_CLAUSE.test(c) || leftWords(c) < 4)));
   const out = kept.join(" ").trim();
   return out || note;
 }
