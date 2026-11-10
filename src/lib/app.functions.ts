@@ -1,3 +1,4 @@
+import { spokenKm } from "./need-text";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -202,6 +203,8 @@ export const talkNeed = createServerFn({ method: "POST" })
           next_question: ready ? null : question,
           status: ready ? "ready" : "asking",
           photo_path: data.photoPath ?? want.photo_path,
+          // A distance the person typed ("5 km ke andar") sets the search area; otherwise keep the current one.
+          ...(spokenKm(userText) != null ? { search_km: spokenKm(userText)! } : {}),
           updated_at: new Date().toISOString(),
         })
         .eq("id", want.id)

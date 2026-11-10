@@ -250,7 +250,7 @@ export function stillToCheck(lines: PlanLine[], cands: { item_id: string; measur
   const out: string[] = [];
   const byId = new Map(cands.map((c) => [c.item_id, c]));
   for (const l of lines) {
-    for (const f of l.unconfirmed ?? []) out.push(`Ask ${l.label} whether it has ${f}. The listing doesn't say.`);
+    for (const f of l.unconfirmed ?? []) out.push(`Ask ${l.label} whether it has ${f.replace(/^(includes?|with|has)\s+/i, "")}. The listing doesn't say.`);
     const c = byId.get(l.item_id);
     if (l.kind === "use_up" && c && c.measured === false) out.push(`${l.label}'s amount is an estimate. Check it at pickup.`);
     if (l.kind === "return" && !(c?.condition ?? "").trim()) out.push(`${l.label} didn't describe the condition. Check it at pickup and add a photo.`);
