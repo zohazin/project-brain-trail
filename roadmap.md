@@ -73,3 +73,10 @@
 - [ ] Demo item photos (files not in the zip — need them, or skip)
 - [ ] Real member data from the old app (only if any existed — needs an export, or skip)
 - [ ] Publish this copy
+
+## AI billing blocker + blocked live tests (request7618.txt) — 2026-11-10
+- [ ] 1. Identify workspace paying for runtime AI (unified credits?) and whether a move is needed
+- [ ] 2. Move workspace only if this one can't fund AI (record project/backend/secrets/email first)
+- [ ] 3. One small authenticated runtime AI request (status, provider, model)
+- [ ] 4. Live tests: DM rhyme, faraway (exception) rhyme, thank-you rhyme, Find chair + replacement
+- [ ] 5. Checks, publish, hand off
