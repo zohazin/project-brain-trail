@@ -49,6 +49,8 @@ When the demo neighbours don't have enough, demo accounts get **fictional** owne
 4. Booking: **I collected these items** → **Confirm pickup as owner**; return fewer → **Confirm return as owner** ("1 still due"); **Owner shares a meeting time**; chat and Make it rhyme work as usual.
 5. Profile → **AI demo results** switch turns it off. **Reset demo data** removes every fictional owner, listing and booking.
 
+Submission document: [`docs/MVP.md`](docs/MVP.md).
+
 ## Published app
 
 https://project-brain-trail.lovable.app — installable from the browser (Install app on Profile; iPhone: Share → Add to Home Screen). Reminders and request expiry run every hour in the background.
@@ -61,12 +63,12 @@ Not included yet: payments inside the app (payment is only reported), phone push
 
 ## Mystery Card
 
-Card: **Card 2 — Shayari Mode.** Status: **Built; all three places work end to end. Live rhyme quality checks paused when the AI balance ran out (10 Nov 2026).**
+Card: **Card 2 — Shayari Mode.** Status: **Built; all three places tested end to end with live AI on 10–11 Nov 2026** (chat in Urdu on a phone-size screen, faraway note in Roman Urdu, thank-you in Roman Urdu and English).
 
 | Required point | Status | Where |
 |---|---|---|
 | 1. Booking chat: "Make it rhyme" beside Send, Urdu / Roman Urdu / English, Friendly / Funny, review before sending | Done and tested (sent, received, reload, one copy on double tap) | `inbox.$requestId.tsx` Chat, `Shayari.tsx` |
-| 2. Faraway (exception) request: anonymity cleaning first, rhyme from the safe version, owner sees "Anonymous borrower" | Done; privacy rules tested on the backend; live rhyme on this screen paused by AI balance | `need.$wantId.tsx` ExceptionCard, `DirectRequest.tsx`, `safe-note.server.ts` |
+| 2. Faraway (exception) request: anonymity cleaning first, rhyme from the safe version, owner sees "Anonymous borrower" | Done and tested live (phone number, address and name removed from source, rhyme, meaning, owner view and notifications) | `need.$wantId.tsx` ExceptionCard, `DirectRequest.tsx`, `safe-note.server.ts` |
 | 3. Thank-you card only after the final return is confirmed | Done and tested (hidden at 11/12, shown at 12/12, ratings unchanged) | `inbox.$requestId.tsx` SayThanks |
 | 4. One shared generator and one shared display | Done | `shayari.functions.ts` `makeShayari`, `Shayari.tsx` `ShayariView` |
 
@@ -75,3 +77,33 @@ Card: **Card 2 — Shayari Mode.** Status: **Built; all three places work end to
 **Demo:** sign in as Ali → Profile → **Prepare Shayari demo** (resets demo data, then sets up a projector chat with Usman, a 12-chair booking with Sara with 1 chair still out, and a camping-tent search 6 km from Farah). Rhymes are never prepared: type any new message. The steps are in the in-app Demo guide → "Shayari demo".
 
 Rules kept: anonymity cleaning only hides or deletes (never adds or reorders words); phone numbers in any format (+92, spaces, dots, brackets, Urdu digits), emails, @handles, links and house numbers are hidden, and unclear numbers make the sender edit; the rhyme may use new poetic words but must keep items, numbers, times, prices and intent (checked by rules plus a second AI reader, with one correction); old results are dropped when text, language or tone changes; each reviewed rhyme is sent once; previews are visible only to their author; blocked chats, paused accounts and closed searches can't send.
+
+## Three-minute presentation
+
+Before: Profile → **Reset demo data** on Ali. Phone A = Ali, Phone B = owner accounts (or one device, using the simulate buttons).
+
+1. **Problem (20 s).** "A family in Multan needs glue guns for one evening. Buying is wasteful; neighbours have them but nobody knows who."
+2. **Fresh request (20 s).** Ali → Find: `Budhwar shaam 5 baje 5 glue guns chahiye, Jumeraat shaam 5 baje wapas, budget zero`.
+3. **One useful question (15 s).** The AI asks once (full-size or mini / glue sticks). Answer it.
+4. **Plan + labels (25 s).** Exact Karachi dates, Owner A 3 + Owner B 2, free, within 5 km. Point at **AI demo results — fictional**, **Demo item**, **Sample photo unavailable**. Send.
+5. **Decline + replacement (25 s).** **Simulate owner accepting** on A, **Simulate owner declining** on B → a replacement for only the 2 missing → approve → accept.
+6. **Pickup + partial return (30 s).** Booking: **I collected these items** → **Confirm pickup as owner**. Return 2 of 3 → owner confirms → "still owed 1". Stock changes only when the owner confirms.
+7. **Shayari (30 s).** In the chat type a real message → **Make it rhyme** → switch Urdu / Roman Urdu / English → show the plain meaning → Send. (Or Profile → **Prepare Shayari demo** for the faraway-note and thank-you examples.)
+8. **Benefit + limits (15 s).** Idle things get used, neighbours stay anonymous until yes. Not yet: in-app payment, phone push alerts, real-phone install checks.
+
+### Likely questions
+
+- **Why AI here?** People describe needs loosely and in Roman Urdu. The AI turns that into item, amount, dates and must-haves, asks the one question that matters, and checks "is this the right kind of item".
+- **What does the database decide?** Everything that counts: free stock at those times, owner hours, distance, price (`price_for`), and every booking change. The AI never books anything.
+- **How is double-booking prevented?** Every yes runs in one locked database step that re-checks free stock; two people racing for the last item → exactly one wins, the other gets a clear message and a replacement (tested).
+- **How are identities protected?** Owners show as "Owner A/B" and borrowers as unnamed until a yes; faraway notes are cleaned of names, numbers and addresses; photos are private and shared only via links that expire after an hour; exact addresses are shared only by choice, per booking.
+- **What is simulated?** Only for demo accounts: fictional owners and listings created by AI, and their yes/no/confirm taps (presenter buttons running the normal rules). Real members never see them.
+- **How would a community start with real inventory?** Members sign up, pick their area, and list what they own with photos, hours, distance and price; an area admin handles reports. Demo data stays separate and can be switched off.
+
+## Physical-phone checklist (not yet done on a real phone)
+
+1. Open https://project-brain-trail.lovable.app on Android Chrome → Profile → **Install app**; on iPhone Safari → Share → **Add to Home Screen**. Open from the home screen: no browser bar.
+2. Sign in, turn on airplane mode, reopen the app: the offline note shows and typed text is kept; turn it off: the message sends once.
+3. During sign-up or when adding a listing → **Use my location**: allow GPS, check the area chosen is right.
+4. Make a rhyme in **Urdu**: letters are joined, right-to-left, nothing cut off; the keyboard doesn't cover the Send button.
+5. After the next publish, reopen the installed app: an **update / Reload** note appears and drafts survive.

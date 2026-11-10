@@ -20,6 +20,14 @@ Central reference for project context. Read this first in every session; update 
 - Not tested in this copy: email delivery, real phone install/GPS. (Shayari live tests and the Find chair walkthrough were done 2026-11-10 — see "AI billing check" below.)
 - **Published 2026-11-10: https://project-brain-trail.lovable.app** (returned 200 with the Cheez Udhaar title).
 
+## Final MVP readiness pass (instruction9187.txt, 2026-11-10/11)
+- Reported errors `src/lib/utils.ts(2,6)` / `src/App.tsx` / `src/pages/NotFound.tsx`: those lines don't exist here (utils.ts only has `cn`); not applicable. The attached spec (sections A–M) was the real task; user **authorised publishing** without asking again.
+- Fixes this pass: demo-only AI fault switch `?demoFault=timeout|balance|invalid|save` (real members refused); retries reuse saved results and clean up stale runs; race loser for the last fictional item gets a clear message + replacement; typed distance ("10 km ke andar") now sticks; "free ho to behtar" = preference, not free-only; faraway notes drop leftover "call me on [hidden]" / "[hidden] mein hai" bits; chat sends stop after 20 s with "try again" (no endless Sending…), closed chats explain why and aren't resent; small-phone (320 px) top bar/notifications fixed; reasons shown under greyed-out pickup/return/rating/listing-hours buttons; a demo reset during AI creation leaves nothing behind.
+- Tested (passed): AI failure screens (simulated), real retry/reuse, two-borrower race, full 5-glue-gun run with decline/replacement/partial return/thank-you/ratings, normal-member listing→booking→ratings, search edits, Shayari DM (Urdu, phone)/faraway (privacy)/thank-you, no rhyme reuse or duplicates, offline/lost-reply/stalled/draft/missed-alert/closed-chat/sign-out, repeat taps on pickup/return/cancel, layouts 320/360/390/1280, reset + permissions (incl. demo admin vs real reports, member reset blocked). 119/119 automatic tests.
+- Submission files: `docs/MVP.md` (no official example was available), README (setup, demo, three-minute script, Q&A, physical-phone checklist).
+- Test members kept (normal accounts, not demo): final-check-lender / final-check-borrower @cheezudhaar.test with one finished drill booking.
+- Still open: GitHub not connected (owner must connect in Lovable → Connectors → GitHub); email delivery untested; physical-phone install/GPS/fonts pending.
+
 ## AI demo results (input9218.txt; request7618.txt re-sent 3×) — built 2026-11-10
 - Request: demo accounts get fictional owners/listings created **live by AI** when the demo neighbours don't have enough, fully usable in matching, booking, chat, handover and Shayari; never shown to real members. (The attached "errors" `src/pages/NotFound.tsx` / `src/App.tsx` don't exist in this app — not applicable; the spec itself said it is a feature request.)
 - Built:

@@ -105,7 +105,7 @@
 - [x] G. Network/account recovery: offline send+reconnect (1 copy), lost reply+retry (1 copy), stalled send stops after 20 s with retry, draft survives reload, missed alerts appear after reconnect, chat closed while queued shows reason and is not resent, sign-out clears device data; repeat taps on pickup/return/cancel count once
 - [x] H. Phone layout (320/360/390/1280 on 10 screens): fixed top bar and notifications header spilling on 320 px, larger "Sample photo unavailable", reasons under greyed-out pickup/return/rating/listing-hours buttons; install file, update reload and no private caching checked (real phone pending)
 - [x] I. Demo reset + permissions: reset restores 7 demo people/10 items, removes fictional owners/listings/rhymes, keeps real members; a reset during AI creation now leaves nothing behind (fixed); demo area admin cannot see or decide real reports; no self-admin; members cannot reset or prepare the demo
-- [ ] J. MVP document + README
-- [ ] K. Three-minute demo script + Q&A
+- [x] J. MVP document (`docs/MVP.md`) + README; GitHub not connected (owner action)
+- [x] K. Three-minute demo script + Q&A + phone checklist (README)
 - [ ] L. Publish + live smoke test
 - [ ] M. Final handoff
