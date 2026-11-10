@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794334551860,
+      "tag": "0000_cheez_udhaar_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794334606577,
+      "tag": "0001_cheez_udhaar_demo_data",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794334620648,
+      "tag": "0002_report_photo_nullif",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794334634935,
+      "tag": "0003_tighten_function_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794334648668,
+      "tag": "0004_grant_policy_helpers",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794334712419,
+      "tag": "0005_phase2_privacy_blocks_specs",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794334891917,
+      "tag": "0006_phase3_bookings_notifications_demo_boundary",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794335020277,
+      "tag": "0007_phase4_quotes_changes_handover_privacy",
+      "breakpoints": true
+    }
+  ]
+}

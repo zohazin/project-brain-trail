@@ -1,0 +1,16 @@
+{
+  "source": "code archive lovable-36845aad-2026-11-10.zip (Cheez Udhaar, Lovable TanStack Start export)",
+  "capabilities": [
+    {"capability": "code", "source": "src/, public/, configs", "outcome": "migrate", "status": "pending", "next_action": "copy source into project"},
+    {"capability": "schema", "source": "drizzle/migrations 0000-0013", "outcome": "migrate", "status": "pending", "next_action": "apply migrations in Lovable Cloud"},
+    {"capability": "records", "source": "old project database", "outcome": "migrate", "status": "pending", "next_action": "demo rows come from migration 0001; real member records need a CSV/JSON export from the old project"},
+    {"capability": "auth identities", "source": "old project users", "outcome": "migrate", "status": "pending", "next_action": "needs user export; demo accounts seeded by migration"},
+    {"capability": "authorization", "source": "RLS, SECURITY DEFINER RPCs, user_roles", "outcome": "migrate", "status": "pending", "next_action": "comes with migrations"},
+    {"capability": "uploaded file bytes", "source": "private photos bucket", "outcome": "migrate", "status": "pending", "next_action": "create photos bucket; old uploaded photos not in archive"},
+    {"capability": "AI", "source": "Lovable AI Gateway (src/lib/ai.server.ts)", "outcome": "preserve", "status": "pending", "next_action": "LOVABLE_API_KEY provided by Cloud"},
+    {"capability": "schedules", "source": "pg_cron cheez-due-events hourly", "outcome": "migrate", "status": "pending", "next_action": "migration 0008"},
+    {"capability": "email auth", "source": "email/password sign-up + reset", "outcome": "migrate", "status": "pending", "next_action": "enable email auth"},
+    {"capability": "secrets", "source": ".env (excluded, not read)", "outcome": "replace", "status": "pending", "next_action": "Cloud supplies its own keys"},
+    {"capability": "verification", "source": "-", "outcome": "verify", "status": "pending", "next_action": "build, tests, browser check"}
+  ]
+}

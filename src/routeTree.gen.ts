@@ -10,33 +10,244 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedTabsRouteRouteImport } from './routes/_authenticated/_tabs/route'
+import { Route as AuthenticatedWelcomeRouteImport } from './routes/_authenticated/welcome'
+import { Route as AuthenticatedTabsActivityRouteImport } from './routes/_authenticated/_tabs/activity'
+import { Route as AuthenticatedTabsAdminRouteImport } from './routes/_authenticated/_tabs/admin'
+import { Route as AuthenticatedTabsFindRouteImport } from './routes/_authenticated/_tabs/find'
+import { Route as AuthenticatedTabsNotificationsRouteImport } from './routes/_authenticated/_tabs/notifications'
+import { Route as AuthenticatedTabsProfileRouteImport } from './routes/_authenticated/_tabs/profile'
+import { Route as AuthenticatedTabsInboxIndexRouteImport } from './routes/_authenticated/_tabs/inbox.index'
+import { Route as AuthenticatedTabsInboxRequestIdRouteImport } from './routes/_authenticated/_tabs/inbox.$requestId'
+import { Route as AuthenticatedTabsListingItemIdRouteImport } from './routes/_authenticated/_tabs/listing.$itemId'
+import { Route as AuthenticatedTabsMyItemsIndexRouteImport } from './routes/_authenticated/_tabs/my-items.index'
+import { Route as AuthenticatedTabsMyItemsItemIdRouteImport } from './routes/_authenticated/_tabs/my-items.$itemId'
+import { Route as AuthenticatedTabsMyItemsNewRouteImport } from './routes/_authenticated/_tabs/my-items.new'
+import { Route as AuthenticatedTabsNeedWantIdRouteImport } from './routes/_authenticated/_tabs/need.$wantId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTabsRouteRoute = AuthenticatedTabsRouteRouteImport.update({
+  id: '/_tabs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWelcomeRoute = AuthenticatedWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTabsActivityRoute =
+  AuthenticatedTabsActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsAdminRoute = AuthenticatedTabsAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedTabsRouteRoute,
+} as any)
+const AuthenticatedTabsFindRoute = AuthenticatedTabsFindRouteImport.update({
+  id: '/find',
+  path: '/find',
+  getParentRoute: () => AuthenticatedTabsRouteRoute,
+} as any)
+const AuthenticatedTabsNotificationsRoute =
+  AuthenticatedTabsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsProfileRoute =
+  AuthenticatedTabsProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsInboxIndexRoute =
+  AuthenticatedTabsInboxIndexRouteImport.update({
+    id: '/inbox/',
+    path: '/inbox/',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsInboxRequestIdRoute =
+  AuthenticatedTabsInboxRequestIdRouteImport.update({
+    id: '/inbox/$requestId',
+    path: '/inbox/$requestId',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsListingItemIdRoute =
+  AuthenticatedTabsListingItemIdRouteImport.update({
+    id: '/listing/$itemId',
+    path: '/listing/$itemId',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsMyItemsIndexRoute =
+  AuthenticatedTabsMyItemsIndexRouteImport.update({
+    id: '/my-items/',
+    path: '/my-items/',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsMyItemsItemIdRoute =
+  AuthenticatedTabsMyItemsItemIdRouteImport.update({
+    id: '/my-items/$itemId',
+    path: '/my-items/$itemId',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsMyItemsNewRoute =
+  AuthenticatedTabsMyItemsNewRouteImport.update({
+    id: '/my-items/new',
+    path: '/my-items/new',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
+const AuthenticatedTabsNeedWantIdRoute =
+  AuthenticatedTabsNeedWantIdRouteImport.update({
+    id: '/need/$wantId',
+    path: '/need/$wantId',
+    getParentRoute: () => AuthenticatedTabsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/welcome': typeof AuthenticatedWelcomeRoute
+  '/activity': typeof AuthenticatedTabsActivityRoute
+  '/admin': typeof AuthenticatedTabsAdminRoute
+  '/find': typeof AuthenticatedTabsFindRoute
+  '/notifications': typeof AuthenticatedTabsNotificationsRoute
+  '/profile': typeof AuthenticatedTabsProfileRoute
+  '/inbox/$requestId': typeof AuthenticatedTabsInboxRequestIdRoute
+  '/listing/$itemId': typeof AuthenticatedTabsListingItemIdRoute
+  '/my-items/$itemId': typeof AuthenticatedTabsMyItemsItemIdRoute
+  '/my-items/new': typeof AuthenticatedTabsMyItemsNewRoute
+  '/need/$wantId': typeof AuthenticatedTabsNeedWantIdRoute
+  '/inbox/': typeof AuthenticatedTabsInboxIndexRoute
+  '/my-items/': typeof AuthenticatedTabsMyItemsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/welcome': typeof AuthenticatedWelcomeRoute
+  '/activity': typeof AuthenticatedTabsActivityRoute
+  '/admin': typeof AuthenticatedTabsAdminRoute
+  '/find': typeof AuthenticatedTabsFindRoute
+  '/notifications': typeof AuthenticatedTabsNotificationsRoute
+  '/profile': typeof AuthenticatedTabsProfileRoute
+  '/inbox/$requestId': typeof AuthenticatedTabsInboxRequestIdRoute
+  '/listing/$itemId': typeof AuthenticatedTabsListingItemIdRoute
+  '/my-items/$itemId': typeof AuthenticatedTabsMyItemsItemIdRoute
+  '/my-items/new': typeof AuthenticatedTabsMyItemsNewRoute
+  '/need/$wantId': typeof AuthenticatedTabsNeedWantIdRoute
+  '/inbox': typeof AuthenticatedTabsInboxIndexRoute
+  '/my-items': typeof AuthenticatedTabsMyItemsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/_tabs': typeof AuthenticatedTabsRouteRouteWithChildren
+  '/_authenticated/welcome': typeof AuthenticatedWelcomeRoute
+  '/_authenticated/_tabs/activity': typeof AuthenticatedTabsActivityRoute
+  '/_authenticated/_tabs/admin': typeof AuthenticatedTabsAdminRoute
+  '/_authenticated/_tabs/find': typeof AuthenticatedTabsFindRoute
+  '/_authenticated/_tabs/notifications': typeof AuthenticatedTabsNotificationsRoute
+  '/_authenticated/_tabs/profile': typeof AuthenticatedTabsProfileRoute
+  '/_authenticated/_tabs/inbox/$requestId': typeof AuthenticatedTabsInboxRequestIdRoute
+  '/_authenticated/_tabs/listing/$itemId': typeof AuthenticatedTabsListingItemIdRoute
+  '/_authenticated/_tabs/my-items/$itemId': typeof AuthenticatedTabsMyItemsItemIdRoute
+  '/_authenticated/_tabs/my-items/new': typeof AuthenticatedTabsMyItemsNewRoute
+  '/_authenticated/_tabs/need/$wantId': typeof AuthenticatedTabsNeedWantIdRoute
+  '/_authenticated/_tabs/inbox/': typeof AuthenticatedTabsInboxIndexRoute
+  '/_authenticated/_tabs/my-items/': typeof AuthenticatedTabsMyItemsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/welcome'
+    | '/activity'
+    | '/admin'
+    | '/find'
+    | '/notifications'
+    | '/profile'
+    | '/inbox/$requestId'
+    | '/listing/$itemId'
+    | '/my-items/$itemId'
+    | '/my-items/new'
+    | '/need/$wantId'
+    | '/inbox/'
+    | '/my-items/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/welcome'
+    | '/activity'
+    | '/admin'
+    | '/find'
+    | '/notifications'
+    | '/profile'
+    | '/inbox/$requestId'
+    | '/listing/$itemId'
+    | '/my-items/$itemId'
+    | '/my-items/new'
+    | '/need/$wantId'
+    | '/inbox'
+    | '/my-items'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/_tabs'
+    | '/_authenticated/welcome'
+    | '/_authenticated/_tabs/activity'
+    | '/_authenticated/_tabs/admin'
+    | '/_authenticated/_tabs/find'
+    | '/_authenticated/_tabs/notifications'
+    | '/_authenticated/_tabs/profile'
+    | '/_authenticated/_tabs/inbox/$requestId'
+    | '/_authenticated/_tabs/listing/$itemId'
+    | '/_authenticated/_tabs/my-items/$itemId'
+    | '/_authenticated/_tabs/my-items/new'
+    | '/_authenticated/_tabs/need/$wantId'
+    | '/_authenticated/_tabs/inbox/'
+    | '/_authenticated/_tabs/my-items/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +259,182 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_tabs': {
+      id: '/_authenticated/_tabs'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedTabsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/welcome': {
+      id: '/_authenticated/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AuthenticatedWelcomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/_tabs/activity': {
+      id: '/_authenticated/_tabs/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedTabsActivityRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/admin': {
+      id: '/_authenticated/_tabs/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedTabsAdminRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/find': {
+      id: '/_authenticated/_tabs/find'
+      path: '/find'
+      fullPath: '/find'
+      preLoaderRoute: typeof AuthenticatedTabsFindRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/notifications': {
+      id: '/_authenticated/_tabs/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedTabsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/profile': {
+      id: '/_authenticated/_tabs/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedTabsProfileRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/inbox/': {
+      id: '/_authenticated/_tabs/inbox/'
+      path: '/inbox'
+      fullPath: '/inbox/'
+      preLoaderRoute: typeof AuthenticatedTabsInboxIndexRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/inbox/$requestId': {
+      id: '/_authenticated/_tabs/inbox/$requestId'
+      path: '/inbox/$requestId'
+      fullPath: '/inbox/$requestId'
+      preLoaderRoute: typeof AuthenticatedTabsInboxRequestIdRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/listing/$itemId': {
+      id: '/_authenticated/_tabs/listing/$itemId'
+      path: '/listing/$itemId'
+      fullPath: '/listing/$itemId'
+      preLoaderRoute: typeof AuthenticatedTabsListingItemIdRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/my-items/': {
+      id: '/_authenticated/_tabs/my-items/'
+      path: '/my-items'
+      fullPath: '/my-items/'
+      preLoaderRoute: typeof AuthenticatedTabsMyItemsIndexRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/my-items/$itemId': {
+      id: '/_authenticated/_tabs/my-items/$itemId'
+      path: '/my-items/$itemId'
+      fullPath: '/my-items/$itemId'
+      preLoaderRoute: typeof AuthenticatedTabsMyItemsItemIdRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/my-items/new': {
+      id: '/_authenticated/_tabs/my-items/new'
+      path: '/my-items/new'
+      fullPath: '/my-items/new'
+      preLoaderRoute: typeof AuthenticatedTabsMyItemsNewRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
+    '/_authenticated/_tabs/need/$wantId': {
+      id: '/_authenticated/_tabs/need/$wantId'
+      path: '/need/$wantId'
+      fullPath: '/need/$wantId'
+      preLoaderRoute: typeof AuthenticatedTabsNeedWantIdRouteImport
+      parentRoute: typeof AuthenticatedTabsRouteRoute
+    }
   }
 }
 
+interface AuthenticatedTabsRouteRouteChildren {
+  AuthenticatedTabsActivityRoute: typeof AuthenticatedTabsActivityRoute
+  AuthenticatedTabsAdminRoute: typeof AuthenticatedTabsAdminRoute
+  AuthenticatedTabsFindRoute: typeof AuthenticatedTabsFindRoute
+  AuthenticatedTabsNotificationsRoute: typeof AuthenticatedTabsNotificationsRoute
+  AuthenticatedTabsProfileRoute: typeof AuthenticatedTabsProfileRoute
+  AuthenticatedTabsInboxRequestIdRoute: typeof AuthenticatedTabsInboxRequestIdRoute
+  AuthenticatedTabsListingItemIdRoute: typeof AuthenticatedTabsListingItemIdRoute
+  AuthenticatedTabsMyItemsItemIdRoute: typeof AuthenticatedTabsMyItemsItemIdRoute
+  AuthenticatedTabsMyItemsNewRoute: typeof AuthenticatedTabsMyItemsNewRoute
+  AuthenticatedTabsNeedWantIdRoute: typeof AuthenticatedTabsNeedWantIdRoute
+  AuthenticatedTabsInboxIndexRoute: typeof AuthenticatedTabsInboxIndexRoute
+  AuthenticatedTabsMyItemsIndexRoute: typeof AuthenticatedTabsMyItemsIndexRoute
+}
+
+const AuthenticatedTabsRouteRouteChildren: AuthenticatedTabsRouteRouteChildren =
+  {
+    AuthenticatedTabsActivityRoute: AuthenticatedTabsActivityRoute,
+    AuthenticatedTabsAdminRoute: AuthenticatedTabsAdminRoute,
+    AuthenticatedTabsFindRoute: AuthenticatedTabsFindRoute,
+    AuthenticatedTabsNotificationsRoute: AuthenticatedTabsNotificationsRoute,
+    AuthenticatedTabsProfileRoute: AuthenticatedTabsProfileRoute,
+    AuthenticatedTabsInboxRequestIdRoute: AuthenticatedTabsInboxRequestIdRoute,
+    AuthenticatedTabsListingItemIdRoute: AuthenticatedTabsListingItemIdRoute,
+    AuthenticatedTabsMyItemsItemIdRoute: AuthenticatedTabsMyItemsItemIdRoute,
+    AuthenticatedTabsMyItemsNewRoute: AuthenticatedTabsMyItemsNewRoute,
+    AuthenticatedTabsNeedWantIdRoute: AuthenticatedTabsNeedWantIdRoute,
+    AuthenticatedTabsInboxIndexRoute: AuthenticatedTabsInboxIndexRoute,
+    AuthenticatedTabsMyItemsIndexRoute: AuthenticatedTabsMyItemsIndexRoute,
+  }
+
+const AuthenticatedTabsRouteRouteWithChildren =
+  AuthenticatedTabsRouteRoute._addFileChildren(
+    AuthenticatedTabsRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedTabsRouteRoute: typeof AuthenticatedTabsRouteRouteWithChildren
+  AuthenticatedWelcomeRoute: typeof AuthenticatedWelcomeRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedTabsRouteRoute: AuthenticatedTabsRouteRouteWithChildren,
+  AuthenticatedWelcomeRoute: AuthenticatedWelcomeRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

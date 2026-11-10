@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "Cheez Udhaar",
+  "short_name": "Cheez Udhaar",
+  "description": "Borrow and lend useful things with neighbours in Multan.",
+  "start_url": "/find",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf8f2",
+  "theme_color": "#1f5f63",
+  "lang": "en",
+  "categories": ["lifestyle", "social"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
