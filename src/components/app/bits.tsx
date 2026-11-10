@@ -2,9 +2,17 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AlertTriangle, Package, RotateCw, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function ItemThumb({ url, name, className }: { url: string | null | undefined; name: string; className?: string }) {
+export function ItemThumb({ url, name, className, emptyText }: { url: string | null | undefined; name: string; className?: string; emptyText?: string | undefined }) {
   if (url) {
     return <img src={url} alt={name} className={cn("aspect-square rounded-xl object-cover", className)} loading="lazy" />;
+  }
+  if (emptyText) {
+    return (
+      <div className={cn("flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-secondary p-1 text-center text-secondary-foreground", className)}>
+        <Package className="h-1/3 w-1/3 opacity-60" aria-hidden />
+        <span className="text-[10px] leading-tight">{emptyText}</span>
+      </div>
+    );
   }
   return (
     <div className={cn("flex aspect-square items-center justify-center rounded-xl bg-secondary text-secondary-foreground", className)} aria-hidden>

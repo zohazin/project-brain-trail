@@ -19,6 +19,8 @@ import { QuoteBox, type QuoteRow } from "@/components/app/Quote";
 import type { Plan, PlanLine } from "@/lib/plan-types";
 import type { ChangePreview } from "@/lib/change";
 import { ensureOnline, useDraft } from "@/hooks/use-app";
+import { AiDemoLabel, DemoIntro, DemoMaker, DemoPlanBanner, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel } from "@/components/app/DemoResults";
+import { demoMatches } from "@/lib/app.functions";
 
 type Want = Database["public"]["Tables"]["wants"]["Row"];
 type Req = Database["public"]["Tables"]["requests"]["Row"];
@@ -282,6 +284,30 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
     refetchOnWindowFocus: false,
   });
   const [sending, setSending] = useState(false);
+  const demoOn = Boolean(profile?.is_demo && profile.ai_demo_results);
+  const [justCreated, setJustCreated] = useState(false);
+  const [replacing, setReplacing] = useState(false);
+  const demoFn = useServerFn(demoMatches);
+
+  async function anotherPlan() {
+    if (replacing || !ensureOnline()) return;
+    setReplacing(true);
+    try {
+      const out = await demoFn({ data: { wantId: want.id, km, mode: "another" } });
+      if (out.ok) {
+        qc.setQueryData(["plan", want.id, km], { ok: true as const, plan: out.plan });
+        qc.removeQueries({ queryKey: ["demo-matches", want.id] });
+        setJustCreated(out.created);
+        toast.success(out.created ? "A new sample plan was created." : (out.note ?? "Done."));
+      } else {
+        toast.error(out.aiError ?? out.problem ?? "Please try again in a moment.");
+      }
+    } catch (e) {
+      toast.error(errMessage(e));
+    } finally {
+      setReplacing(false);
+    }
+  }
 
   async function send(lines: PlanLine[], exception?: { note: string; previewId?: string | undefined }) {
     if (sending) return;
@@ -328,6 +354,7 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
         )}
       </div>
 
+      {demoOn && <DemoIntro />}
       {plan.isPending && (
         <Card>
           <p className="flex items-center gap-2 text-muted-foreground">
@@ -359,6 +386,9 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
                 {p.pickups} {p.pickups === 1 ? "pickup" : "pickups"} · Total: <strong className="text-foreground">{money(p.total)}</strong>
                 {p.overBudget && <span className="ml-2 font-semibold text-attention-foreground">Over your budget</span>}
               </p>
+              {p.lines.some((l) => l.generated) && (
+                <DemoPlanBanner plan={p} justCreated={justCreated} canReplace={want.status === "ready"} onAnother={() => void anotherPlan()} busy={replacing} />
+              )}
               <FitAndChecks plan={p} />
               <ul className="mt-3 divide-y">
                 {p.lines.map((l) => (
@@ -379,6 +409,18 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
             </Card>
           )}
 
+          {p.missing > 0 && demoOn && !replacing && (
+            <DemoMaker
+              wantId={want.id}
+              km={km}
+              need={p.need}
+              missing={p.missing}
+              onPlan={(o) => {
+                qc.setQueryData(["plan", want.id, km], { ok: true as const, plan: o.plan });
+                setJustCreated(o.created);
+              }}
+            />
+          )}
           {p.missing > 0 && (
             <Card tone="attention">
               <p className="text-lg font-semibold">
@@ -471,11 +513,13 @@ function FitAndChecks({ plan }: { plan: Plan }) {
 function PlanRow({ line }: { line: PlanLine }) {
   return (
     <li className="flex items-center gap-3 py-3">
-      <ItemThumb url={line.photo_url} name={line.item_name} className="h-16 w-16 shrink-0" />
+      <ItemThumb url={line.photo_url} name={line.item_name} className="h-16 w-16 shrink-0" emptyText={line.generated ? SAMPLE_PHOTO_TEXT : undefined} />
       <div className="min-w-0 flex-1">
+        {line.generated && <AiDemoLabel className="mb-1" />}
         <p className="font-semibold">
           {line.label} · {fmtQty(line.quantity, line.unit)} {line.unit === "item" ? line.item_name.toLowerCase() : `of ${line.item_name.toLowerCase()}`}
         </p>
+        {line.generated && line.why && <p className="text-sm">{line.why}</p>}
         <p className="flex items-center gap-1 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" aria-hidden /> Pickup near {line.area_name || "your area"} · {fmtDistance(line.distance_km)}
         </p>
@@ -595,6 +639,20 @@ function ExceptionCard({
 function Backup({ want, plan }: { want: Want; plan: Plan }) {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
+  const { data: profile } = useQuery(profileQuery(want.borrower_id));
+  const demoOn = Boolean(profile?.is_demo && profile.ai_demo_results);
+  const demo =
+    demoOn && !plan.failed && plan.missing > 0 ? (
+      <DemoMaker
+        wantId={want.id}
+        km={plan.km}
+        need={plan.need}
+        missing={plan.missing}
+        backup
+        planCreatedAt={plan.created_at}
+        onPlan={() => void qc.invalidateQueries({ queryKey: ["want", want.id] })}
+      />
+    ) : null;
 
   async function approve() {
     if (busy) return;
@@ -630,16 +688,20 @@ function Backup({ want, plan }: { want: Want; plan: Plan }) {
   }
   if (plan.lines.length === 0) {
     return (
-      <Card tone="attention">
-        <p className="text-lg font-semibold">{plan.reason}</p>
-        <p>We looked again but found no one else within {plan.km} km for the missing amount. Everything already confirmed is kept.</p>
-        <Button variant="outline" className="mt-2" onClick={dismiss}>
-          OK
-        </Button>
-      </Card>
+      <>
+        <Card tone="attention">
+          <p className="text-lg font-semibold">{plan.reason}</p>
+          <p>We looked again but found no one else within {plan.km} km for the missing amount. Everything already confirmed is kept.</p>
+          <Button variant="outline" className="mt-2" onClick={dismiss}>
+            OK
+          </Button>
+        </Card>
+        {demo}
+      </>
     );
   }
   return (
+    <>
     <Card tone="attention">
       <p className="text-lg font-semibold">{plan.reason}</p>
       <p>
@@ -661,6 +723,8 @@ function Backup({ want, plan }: { want: Want; plan: Plan }) {
         </Button>
       </div>
     </Card>
+    {demo}
+    </>
   );
 }
 
@@ -708,11 +772,17 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
       <ul className="space-y-2">
         {live.map((r) => (
           <li key={r.id}>
-            <Card className="flex items-center gap-3">
+            <Card className="flex flex-wrap items-center gap-3">
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">
                   {r.owner_name} · {fmtQty(Number(r.quantity), r.unit)} {r.unit === "item" ? r.item_name.toLowerCase() : r.item_name.toLowerCase()}
                 </p>
+                {r.simulated && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    <SimulatedOwnerLabel />
+                    <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Fictional demo listing</span>
+                  </div>
+                )}
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   <Pill tone={statusTone(r.status)}>{requestStatusWords({ ...r, quantity: Number(r.quantity) }, false)}</Pill>
                   <span className="text-sm text-muted-foreground">{money(Number(r.total_rs))}</span>
@@ -729,6 +799,11 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
                     Open <ChevronRight />
                   </Link>
                 </Button>
+              )}
+              {r.simulated && r.status === "requested" && (
+                <div className="basis-full">
+                  <SimOwnerActions r={r} />
+                </div>
               )}
               {r.status === "requested" && (
                 <Button

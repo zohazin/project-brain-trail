@@ -218,7 +218,27 @@ export async function buildPlan(want: Want, km: number): Promise<Plan> {
   base.overBudget = budget != null && budget > 0 && base.total > budget;
   base.explanation = explainPlan(base, (want.item_name ?? "items").toLowerCase(), want.unit);
   base.checks = stillToCheck(base.lines, cands);
+  await markGenerated(db, [...base.lines, ...base.exceptions], base);
   return base;
+}
+
+/** Labels fictional AI demo listings so they are never shown as real neighbours. */
+async function markGenerated(db: DB, lines: PlanLine[], plan: Plan) {
+  if (lines.length === 0) return;
+  const { data } = await db
+    .from("items")
+    .select("id, why_it_matches, created_at")
+    .in("id", lines.map((l) => l.item_id))
+    .eq("is_generated", true);
+  if (!data?.length) return;
+  const gen = new Map(data.map((d) => [d.id, d]));
+  for (const l of lines) {
+    const g = gen.get(l.item_id);
+    if (!g) continue;
+    l.generated = true;
+    l.why = g.why_it_matches || undefined;
+  }
+  plan.demoCreatedAt = data.map((d) => d.created_at).sort()[0];
 }
 
 /** What the borrower should still confirm with each owner. Unknown must-haves stay questions, never assumed. */

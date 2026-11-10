@@ -44,7 +44,7 @@ export const MAX_ROUNDS_PER_SEARCH = 6;
 export const MAX_GENERATIONS_PER_DAY = 15;
 
 const CONTACT = /(\+?92|\b0?3\d{2})[\s-]?\d{3,}|\d{7,}|@|https?:|www\.|\.com\b|whatsapp/i;
-const STOP = new Set(["the", "and", "for", "with", "must", "have", "has", "needs", "need", "include", "includes", "including", "that", "can", "use", "able"]);
+const STOP = new Set(["the", "and", "for", "with", "must", "have", "has", "needs", "need", "include", "includes", "including", "that", "can", "use", "able", "input", "port", "included", "size", "type", "work", "works"]);
 
 /** Stable key for one version of a search: the same details never make a second AI call. */
 export function demoVersionKey(n: DemoNeed): string {
@@ -104,7 +104,7 @@ export function mentions(requirement: string, text: string): boolean {
   const t = text.toLowerCase();
   const ws = words(requirement);
   if (ws.length === 0) return true;
-  return ws.some((w) => t.includes(w) || (w.endsWith("s") && t.includes(w.slice(0, -1))));
+  return ws.every((w) => t.includes(w) || (w.endsWith("s") && t.includes(w.slice(0, -1))));
 }
 
 /** Greedy share of the shortfall, nearest first (as the plan does when no single owner has enough). */

@@ -8,6 +8,7 @@ import { resetDemo } from "@/lib/app.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Card, PageTitle, Pill } from "@/components/app/bits";
 import { LocationPicker, type PickedPlace } from "@/components/app/LocationPicker";
 import { DistancePicker } from "@/components/app/DistancePicker";
@@ -169,6 +170,7 @@ function Profile() {
         <Card tone="attention" className="space-y-2">
           <p className="font-semibold">Demo account</p>
           <p className="text-sm">Demo accounts only see demo people and demo items. Real members never see them.</p>
+          <AiDemoSwitch userId={p.id} on={p.ai_demo_results} />
           <DemoGuide />
           <p className="text-sm">
             Reset removes the old demo requests, chats and reminders, puts the chairs, glue and paint back, and leaves every real member's records alone.
@@ -241,6 +243,37 @@ function ImpactStat({ label, value }: { label: string; value: number }) {
     <div className="flex flex-col-reverse rounded-xl bg-muted p-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="text-2xl font-bold">{value}</dd>
+    </div>
+  );
+}
+
+/** Presenter setting: let AI create fictional sample listings when the demo neighbours don't have enough. */
+function AiDemoSwitch({ userId, on }: { userId: string; on: boolean }) {
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-card p-3">
+      <Switch
+        id="ai-demo-results"
+        checked={on}
+        disabled={busy}
+        onCheckedChange={async (v) => {
+          setBusy(true);
+          const { error } = await supabase.from("profiles").update({ ai_demo_results: v, updated_at: new Date().toISOString() }).eq("id", userId);
+          setBusy(false);
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
+          toast.success(v ? "AI demo results are on." : "AI demo results are off.");
+          await qc.invalidateQueries({ queryKey: ["profile", userId] });
+        }}
+      />
+      <label htmlFor="ai-demo-results" className="text-sm">
+        <span className="font-semibold">Show AI demo results</span>
+        <br />
+        When the demo neighbours don't have enough, AI creates fictional owners and listings live for your request. They are labelled and only demo accounts see them.
+      </label>
     </div>
   );
 }

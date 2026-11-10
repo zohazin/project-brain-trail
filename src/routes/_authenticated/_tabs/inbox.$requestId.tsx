@@ -36,6 +36,7 @@ import { ensureOnline, useDraft } from "@/hooks/use-app";
 import { cn } from "@/lib/utils";
 import { ShayariPanel, ShayariView } from "@/components/app/Shayari";
 import { bookingDone, isShayariSnapshot, thanksStarter, type ShayariSnapshot } from "@/lib/shayari";
+import { AiDemoLabel, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel } from "@/components/app/DemoResults";
 
 type Req = Database["public"]["Tables"]["requests"]["Row"];
 type Bundle = RequestBundle;
@@ -117,8 +118,14 @@ function Booking() {
       </Link>
       <Card id="summary" className="space-y-3">
         <div className="flex gap-4">
-          <ItemThumb url={photos.data?.items?.[requestId]} name={r.item_name} className="h-24 w-24 shrink-0" />
+          <ItemThumb url={photos.data?.items?.[requestId]} name={r.item_name} className="h-24 w-24 shrink-0" emptyText={r.simulated ? SAMPLE_PHOTO_TEXT : undefined} />
           <div className="min-w-0 flex-1 space-y-1">
+            {r.simulated && (
+              <div className="flex flex-wrap gap-1">
+                <AiDemoLabel />
+                <SimulatedOwnerLabel />
+              </div>
+            )}
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-bold">
                 {fmtQty(n(r.quantity), r.unit)} {r.item_name.toLowerCase()}
@@ -153,6 +160,7 @@ function Booking() {
         </div>
         <Counts r={r} />
         <NextStep r={r} iAmOwner={iAmOwner} otherName={otherName} />
+        {!iAmOwner && r.simulated && <SimOwnerActions r={r} showMeet={r.status === "confirmed"} />}
         {(r.status === "requested" || r.status === "confirmed") && n(r.picked_up_qty) === 0 && (
           <CancelBooking r={r} iAmOwner={iAmOwner} otherName={otherName} />
         )}

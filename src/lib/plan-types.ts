@@ -23,6 +23,10 @@ export type PlanLine = {
   avg_rating: number | null;
   rating_count: number;
   condition?: string;
+  /** Fictional listing created by AI for a demo account (AI demo results). */
+  generated?: boolean | undefined;
+  /** Why the fictional listing fits, written by the AI for the presenter. */
+  why?: string | undefined;
 };
 
 export type Plan = {
@@ -43,4 +47,6 @@ export type Plan = {
   reason?: string;
   failed?: boolean;
   created_at?: string;
+  /** When AI demo results are part of this plan: when they were first created. */
+  demoCreatedAt?: string | undefined;
 };

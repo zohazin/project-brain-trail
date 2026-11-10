@@ -366,6 +366,64 @@ export const answerRequest = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------------- AI demo results (demo accounts only) ----------------
+/** Fills the missing amount of a demo search with fictional listings made live by AI (or reuses saved ones). */
+export const demoMatches = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        wantId: z.string().uuid(),
+        km: z.number().min(0.5).max(100),
+        mode: z.enum(["auto", "retry", "another"]),
+        backup: z.boolean().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    // Ownership is checked as the signed-in person first (RLS), then again inside demoPlan.
+    const w = await context.supabase.from("wants").select("id, search_km, pending_plan").eq("id", data.wantId).single();
+    if (w.error || !w.data) throw new Error("Not found");
+    const { demoPlan } = await import("./demo-gen.server");
+    const km = data.backup ? Number(w.data.search_km) : data.km;
+    const out = await demoPlan({ borrowerId: context.userId, wantId: data.wantId, km, mode: data.mode });
+    if (data.backup && out.ok && out.created) {
+      const { prepareBackup } = await import("./plan.server");
+      const reason = (w.data.pending_plan as Plan | null)?.reason ?? "An owner can't lend.";
+      await prepareBackup(data.wantId, reason);
+    }
+    return out;
+  });
+
+/** Presenter controls for a simulated demo owner. They run the normal booking rules as that owner. */
+export const simOwnerAction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ requestId: z.string().uuid(), action: z.enum(["accept", "decline", "pickup", "return", "meet"]) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: me } = await context.supabase.from("profiles").select("is_demo").eq("id", context.userId).single();
+    if (!me?.is_demo) throw new Error("Demo actions are only for demo accounts.");
+    const before = await context.supabase.from("requests").select("*").eq("id", data.requestId).single();
+    if (before.error || !before.data || before.data.borrower_id !== context.userId || !before.data.simulated) {
+      throw new Error("Demo actions work only with simulated demo owners.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const r = await supabaseAdmin.rpc("sim_owner_act", { _req: data.requestId, _presenter: context.userId, _action: data.action });
+    if (r.error) throw new Error(r.error.message);
+    const status = String((r.data as { status?: string } | null)?.status ?? "");
+    if (data.action === "accept" && status === "expired") {
+      throw new Error("This request expired because the pickup time has passed. Nothing was booked.");
+    }
+    if (data.action === "decline" && before.data.status === "requested") {
+      const { prepareBackup } = await import("./plan.server");
+      const b = before.data;
+      const unit = b.unit === "item" ? b.item_name.toLowerCase() : `${b.unit} of ${b.item_name.toLowerCase()}`;
+      await prepareBackup(b.want_id, `${b.owner_name || "An owner"} can't lend ${Number(b.quantity)} ${unit}.`);
+    }
+    return { ok: true, status };
+  });
+
 // Owner answers an exception (distance) first; this is separate from saying yes to the booking.
 export const answerException = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -509,8 +567,13 @@ export const nearbyItems = createServerFn({ method: "POST" })
     });
     if (r.error) throw new Error(r.error.message);
     const urls = await signPaths((r.data ?? []).map((x) => x.photo_path));
+    // Fictional AI demo listings carry a label (demo accounts only ever see demo listings).
+    const ids = (r.data ?? []).map((x) => x.item_id);
+    const gen = ids.length ? await context.supabase.rpc("generated_item_ids", { _ids: ids }) : { data: [] as string[] };
+    const generated = new Set((gen.data ?? []) as string[]);
     return (r.data ?? []).map((x) => ({
       ...x,
+      is_generated: generated.has(x.item_id),
       listed_qty: Number(x.listed_qty),
       free_qty: x.free_qty == null ? null : Number(x.free_qty),
       time_note: x.time_note ?? null,
@@ -615,8 +678,10 @@ export const listingDetail = createServerFn({ method: "POST" })
     const it = (r.data ?? [])[0];
     if (!it) return null;
     const urls = await signPaths(it.photo_paths ?? []);
+    const gen = await context.supabase.rpc("generated_item_ids", { _ids: [data.itemId] });
     return {
       ...it,
+      is_generated: ((gen.data ?? []) as string[]).includes(data.itemId),
       price_rs: Number(it.price_rs),
       price_per: Number(it.price_per),
       distance_km: Number(it.distance_km),

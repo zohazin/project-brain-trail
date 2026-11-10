@@ -199,6 +199,7 @@ Read the whole conversation and the already known details, then fill every field
 - Ambiguous times: if a time could mean two things (e.g. "kal raat" with no hour, "8 baje" that could be morning or evening, "subah" without a time), leave that time null and ask one short question that confirms it with the exact date, e.g. "Do you mean Tuesday 10 November at 8 PM?" (or the same in Roman Urdu).
 - requirements: must-have features the person clearly needs, as short English phrases (e.g. ["HDMI input"], ["size 9"], ["for a laptop"]). Keep earlier requirements unless the person changes them. [] if none.
 - Critical details: some items come in versions where the wrong one is useless (projector input type such as HDMI or VGA, charger type, shoe or clothes size, drill bit size, ladder height). If such a detail is unknown and was never asked in the conversation, ask ONE short question about it right after quantity, e.g. "Does it need an HDMI input?". If the person says it doesn't matter, don't ask again.
+- Reusable tools and their supplies are different things: a glue gun is "return"; glue sticks are "use_up". For a tool, the critical-detail question may be the one detail that changes which tool fits (e.g. "Mini or full-size glue gun? Do you need glue sticks with it?"). Put real must-haves in requirements (e.g. "includes glue sticks").
 - If the conversation shows the app guessed an item from a photo and the person confirms (yes, haan, ji, sahi), use that item. If they correct it, use their correction.
 - Never ask again about something already given. If return time is before pickup time, ask "When will you bring it back?" again.
 - summary: one private sentence in English describing exactly what is needed, for matching.
@@ -579,7 +580,7 @@ They are clearly labelled as fictional to the presenter. Make them realistic, sp
 Create 1 to 3 listings from different fictional neighbours that together have at least the missing amount.
 - If the missing amount is 4 or more countable items, split it across 2 or 3 owners so that no single owner has all of it (for example 5 = 3 + 2).
 - If the missing amount is small (1 to 3 items, or a supply amount), one owner is enough.
-- item_name: plain English name of the right item (the same kind of thing the person needs, not an accessory or a different tool).
+- item_name: plain English name of the right item, plural when quantity is more than 1 (e.g. "Full-size glue guns") (the same kind of thing the person needs, not an accessory or a different tool).
 - Reusable tools and their supplies are different things: a glue gun is borrowed and returned; glue sticks are used up.
 - Every must-have feature must be written plainly in description or specs (copy the feature words), and listed in "meets".
 - Realistic specs for the item (sizes, wattage, material, what is included), a short condition note, accessories (or "" if none).

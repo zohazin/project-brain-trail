@@ -22,6 +22,9 @@ export async function wipeDemo(admin: Admin): Promise<number> {
   check(await admin.from("shayari_attempts").delete().in("user_id", ids), "rhyme limits");
   check(await admin.from("reports").delete().in("reporter_id", ids).in("against_id", ids), "reports");
   if (reqIds.length) check(await admin.from("requests").delete().in("id", reqIds), "bookings");
+  // AI demo results: fictional listings, simulated owners and their generation logs.
+  const { wipeGenerated } = await import("./demo-gen.server");
+  await wipeGenerated(admin, ids);
   // Demo searches that never reached a real member.
   const { data: wantsWithReal } = await admin.from("requests").select("want_id").in("borrower_id", ids);
   const keep = new Set((wantsWithReal ?? []).map((w) => w.want_id));

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, CalendarClock, MapPin, Package, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, Empty, ItemThumb, Stars } from "@/components/app/bits";
+import { AiDemoLabel, SAMPLE_PHOTO_TEXT, SimulatedOwnerLabel } from "@/components/app/DemoResults";
 import { DirectRequest } from "@/components/app/DirectRequest";
 import { listingDetail } from "@/lib/app.functions";
 import { DAY_NAMES, fmtClock, fmtDistance, fmtQty, priceLabel } from "@/lib/format";
@@ -64,7 +65,7 @@ function Listing() {
       <Card className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-[minmax(0,16rem)_1fr]">
           <div className="space-y-2">
-            <ItemThumb url={it.photo_urls[shown] ?? null} name={it.item_name} className="w-full" />
+            <ItemThumb url={it.photo_urls[shown] ?? null} name={it.item_name} className="w-full" emptyText={it.is_generated ? SAMPLE_PHOTO_TEXT : undefined} />
             {it.photo_urls.length > 1 && (
               <div className="flex gap-2" role="group" aria-label="More photos">
                 {it.photo_urls.map((u, i) => (
@@ -77,6 +78,12 @@ function Listing() {
           </div>
           <div className="min-w-0 space-y-2">
             {it.category && <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{it.category}</p>}
+            {it.is_generated && (
+              <div className="flex flex-wrap gap-1">
+                <AiDemoLabel />
+                <SimulatedOwnerLabel />
+              </div>
+            )}
             <h1 className="text-2xl font-bold">{it.item_name}</h1>
             <p className="text-xl font-semibold text-primary">{priceLabel(it.kind, it.price_rs, it.price_per, it.unit, it.price_period, it.listed_qty)}</p>
             <Stars avg={it.avg_rating} count={it.rating_count} />
