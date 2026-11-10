@@ -39,9 +39,19 @@ Demo accounts are fictional and only ever see each other (real members never see
 6. On Sara's booking (Inbox): chat, Ali taps **I collected these items**, Sara taps **Confirm**. Ali returns 11 → Sara confirms → “11 of 12 returned — 1 still due”. Ali returns the last one → Sara confirms → both rate.
 7. Profile → **Reset demo data** puts everything back (real members' data is never touched). The same steps are in the app: Profile → **Demo guide**.
 
+### AI demo results (one device, any item)
+
+When the demo neighbours don't have enough, demo accounts get **fictional** owners and listings created live by AI for the missing amount only (labelled "AI demo result", "Fictional demo listing", "Simulated owner", "Sample photo unavailable"). Real members never see them.
+
+1. Ali → Find: `Sunday ko 5 glue guns chahiye, 1 baje le jaunga, shaam 6 baje wapas. Budget 600` → answer the detail question.
+2. AI creates e.g. Owner A 3 + Owner B 2 within budget, distance and times (checked by the server and the database). Saved results are reused on reload; **Create another sample plan** replaces them before sending.
+3. Send → **Simulate owner accepting** / **Simulate owner declining** (a no brings a replacement for only the missing amount, approved by Ali).
+4. Booking: **I collected these items** → **Confirm pickup as owner**; return fewer → **Confirm return as owner** ("1 still due"); **Owner shares a meeting time**; chat and Make it rhyme work as usual.
+5. Profile → **Show AI demo results** switches it off. **Reset demo data** removes every fictional owner, listing and booking.
+
 ## Published app
 
-https://everready-project-guide.lovable.app — installable from the browser (Install app on Profile; iPhone: Share → Add to Home Screen). Reminders and request expiry run every hour in the background.
+https://project-brain-trail.lovable.app — installable from the browser (Install app on Profile; iPhone: Share → Add to Home Screen). Reminders and request expiry run every hour in the background.
 
 ## What this MVP does
 

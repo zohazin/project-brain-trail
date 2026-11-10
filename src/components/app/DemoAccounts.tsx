@@ -97,6 +97,7 @@ export function DemoGuide({ className }: { className?: string }) {
         </li>
       </ol>
       <p className="mt-2 text-xs text-muted-foreground">Demo people are made up and only ever see each other. The AI replies are live, not recorded.</p>
+      <AiDemoSteps />
       <ShayariDemoSteps />
     </details>
   );
@@ -180,5 +181,30 @@ export function ShayariDemoSetup() {
         </ul>
       )}
     </div>
+  );
+}
+
+/** AI demo results: fictional owners and listings created live when the demo neighbours don't have enough. */
+export function AiDemoSteps() {
+  return (
+    <section aria-labelledby="ai-demo" className="mt-3 rounded-xl border border-border p-3">
+      <h3 id="ai-demo" className="font-semibold">AI demo results (any item, one device)</h3>
+      <ol className="mt-2 list-decimal space-y-1 pl-5">
+        <li>
+          Sign in as <strong>Ali</strong>. On Find type, for example: <em>Sunday ko 5 glue guns chahiye, 1 baje le jaunga, shaam 6 baje wapas. Budget 600</em>. Answer
+          the one detail question (e.g. full-size, no glue sticks).
+        </li>
+        <li>
+          The demo neighbours have no glue guns, so AI creates 1–3 <strong>fictional</strong> owners live (e.g. 3 + 2), marked “AI demo result”, “Fictional demo listing”
+          and “Sample photo unavailable”. Prices, distance and times are checked by the app. Demo stock that fits is always used first.
+        </li>
+        <li>Tap Send. On each request use the demo buttons: “Simulate owner accepting” or “Simulate owner declining”. A no brings a replacement for only the missing amount.</li>
+        <li>
+          Open a booking: tap “I collected these items”, then “Confirm pickup as owner”. Return fewer, then “Confirm return as owner” to show “1 still due”. Try
+          “Owner shares a meeting time” and Make it rhyme in the chat.
+        </li>
+        <li>“Create another sample plan” makes a new one before you send. Profile → “Show AI demo results” turns this off. Reset removes every fictional owner and listing.</li>
+      </ol>
+    </section>
   );
 }
