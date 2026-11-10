@@ -21,6 +21,8 @@ type DB = SupabaseClient<Database>;
 type Want = Database["public"]["Tables"]["wants"]["Row"];
 
 export type DemoMode = "auto" | "retry" | "another";
+/** Presenter test switch for demo accounts only: makes the AI step fail in a chosen way. Never honoured for real members. */
+export type DemoFault = "timeout" | "balance" | "invalid" | "save";
 export type DemoOutcome =
   | { ok: true; plan: Plan; created: boolean; note: string | null }
   | { ok: false; pending: true; aiError?: undefined; problem?: undefined }
@@ -58,7 +60,7 @@ async function removeSimOwnerIfUnused(db: DB, ownerId: string) {
   if (!items && !reqs) await db.auth.admin.deleteUser(ownerId);
 }
 
-async function saveListings(db: DB, generationId: string, want: Want, need: DemoNeed, list: DemoListingDraft[]) {
+async function saveListings(db: DB, generationId: string, want: Want, need: DemoNeed, list: DemoListingDraft[], breakAfterFirst = false) {
   const itemIds: string[] = [];
   const ownerIds: string[] = [];
   const centre = MULTAN_AREAS[0]!;
@@ -135,6 +137,7 @@ async function saveListings(db: DB, generationId: string, want: Want, need: Demo
         .single();
       if (it.error || !it.data) throw new Error(`sample listing: ${it.error?.message ?? "not saved"}`);
       itemIds.push(it.data.id);
+      if (breakAfterFirst) throw new Error("test: connection lost while saving");
     }
     return { itemIds, ownerIds };
   } catch (e) {
@@ -144,13 +147,24 @@ async function saveListings(db: DB, generationId: string, want: Want, need: Demo
   }
 }
 
+/** Marks a creation that never finished as failed and removes anything it left behind (listings nobody requested, unused owners). */
+async function abandon(db: DB, generationId: string) {
+  const { data: items } = await db.from("items").select("id, owner_id").eq("generation_id", generationId).eq("is_generated", true);
+  for (const it of items ?? []) {
+    const { count } = await db.from("requests").select("id", { count: "exact", head: true }).eq("item_id", it.id);
+    if (!count) await db.from("items").delete().eq("id", it.id);
+    await removeSimOwnerIfUnused(db, it.owner_id);
+  }
+  await db.from("demo_generations").update({ status: "failed", error: "Creating sample matches stopped before it finished. Nothing was added.", finished_at: new Date().toISOString() }).eq("id", generationId).eq("status", "running");
+}
+
 /**
  * Fills only the missing amount of a demo search with fictional listings made live by AI.
  * - "auto": reuses what was already made for these exact details (no second AI call).
  * - "retry": after a failure, the presenter asked to try again.
  * - "another": the presenter asked for a different sample plan (only before anything was sent).
  */
-export async function demoPlan(args: { borrowerId: string; wantId: string; km: number; mode: DemoMode }): Promise<DemoOutcome> {
+export async function demoPlan(args: { borrowerId: string; wantId: string; km: number; mode: DemoMode; fault?: DemoFault | undefined }): Promise<DemoOutcome> {
   const db = await admin();
   const [{ data: me }, { data: want }] = await Promise.all([
     db.from("profiles").select("is_demo, is_simulated, ai_demo_results, restricted").eq("id", args.borrowerId).single(),
@@ -208,6 +222,11 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
   const last = prev?.[0];
   const fresh = last ? Date.now() - new Date(last.created_at).getTime() < STALE_MS : false;
   if (last?.status === "running" && fresh) return { ok: false, pending: true };
+  if (last?.status === "running" && !fresh) await abandon(db, last.id); // a creation that never finished: clear its leftovers
+  // A ready result is reused for "auto" and also for "retry": a retry after a lost answer must not create a second set.
+  if (last?.status === "ready" && args.mode !== "another") {
+    return { ok: true, plan, created: false, note: "The saved sample listings don't cover everything for these details. You can create another sample plan." };
+  }
   if (last && args.mode === "auto") {
     if (last.status === "ready") {
       return { ok: true, plan, created: false, note: "The saved sample listings don't cover everything for these details. You can create another sample plan." };
@@ -242,8 +261,11 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
 
   const { data: sims } = await db.from("profiles").select("display_name").eq("is_simulated", true).limit(200);
   const avoid = Array.from(new Set([...RESERVED_NAMES, ...(sims ?? []).map((s) => s.display_name.toLowerCase())])).slice(0, 60);
-  const ask = (problems?: string[]) =>
-    proposeDemoListings({
+  const ask = async (problems?: string[]) => {
+    if (args.fault === "timeout") throw new AiUnavailableError("timeout");
+    if (args.fault === "balance") throw new AiUnavailableError("balance");
+    if (args.fault === "invalid") return { listings: [] as DemoListingDraft[] };
+    return proposeDemoListings({
       need,
       summary: want.ai_summary ?? `${want.quantity} ${want.item_name}`,
       details: want.details,
@@ -254,6 +276,7 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
       avoidNames: avoid,
       ...(problems ? { problems } : {}),
     });
+  };
   try {
     let check = checkDemoListings((await ask()).listings, need);
     if (!check.ok) check = checkDemoListings((await ask(check.problems)).listings, need); // one bounded correction
@@ -263,7 +286,7 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
       await fail(NOT_FIT);
       return { ok: false, aiError: NOT_FIT, retryAfter: null };
     }
-    const made = await saveListings(db, genId, want, need, check.listings);
+    const made = await saveListings(db, genId, want, need, check.listings, args.fault === "save");
     await db
       .from("demo_generations")
       .update({ status: "ready", item_ids: made.itemIds, owner_ids: made.ownerIds, proposal: check.listings, finished_at: new Date().toISOString() })

@@ -93,3 +93,19 @@
 - [x] Demo guide, chat.md, publish
 - [x] Second pass: exact spec wording, distance not a must-have, spec glue-gun example + final return + thank-you + rating + paid grams supply tested
 - [ ] Not forced live: AI failure on this feature; two borrowers racing for the last fictional item (both use existing safeguards)
+
+## Final MVP pass (instruction9187.txt) — 2026-11-10
+- [x] A. Current state: live app has AI demo results (checked live files); source 7d93ea5
+- [ ] B1. Controlled AI failure (timeout / no balance / bad output / connection lost) — demo-only, no orphans, reuse after uncertain retry
+- [ ] B2. Two demo borrowers race for one fictional item — only one wins
+- [ ] C. Full five-glue-gun run across every owner (live AI)
+- [ ] D. Normal member end-to-end (signup, listing+photo, pause/resume, request, chat, pickup/return, review)
+- [ ] E. Request edits + generation reuse; 250 g × Rs 80/100 g = Rs 200
+- [ ] F. Shayari three entry points re-check
+- [ ] G. Network/account recovery checks
+- [ ] H. Phone layout + PWA checks
+- [ ] I. Demo reset + permission checks
+- [ ] J. MVP document + README
+- [ ] K. Three-minute demo script + Q&A
+- [ ] L. Publish + live smoke test
+- [ ] M. Final handoff

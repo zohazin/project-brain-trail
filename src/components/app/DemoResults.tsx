@@ -90,15 +90,22 @@ export function DemoPlanBanner({ plan, justCreated, canReplace, onAnother, busy 
 }
 
 type Outcome = Awaited<ReturnType<typeof demoMatches>>;
+const FAULTS = ["timeout", "balance", "invalid", "save"] as const;
+function faultFromUrl(search: string): (typeof FAULTS)[number] | undefined {
+  const v = new URLSearchParams(search).get("demoFault");
+  return (FAULTS as readonly string[]).includes(v ?? "") ? (v as (typeof FAULTS)[number]) : undefined;
+}
 
 /** Asks the server to fill the missing amount with fictional listings. Runs once per search version; never repeats on its own after a failure. */
 export function DemoMaker({ wantId, km, need, missing, backup, planCreatedAt, onPlan }: { wantId: string; km: number; need: number; missing: number; backup?: boolean; planCreatedAt?: string | undefined; onPlan: (o: Extract<Outcome, { ok: true }>) => void }) {
   const fn = useServerFn(demoMatches);
   const [manual, setManual] = useState<Outcome | null>(null);
   const [busy, setBusy] = useState(false);
+  // Presenter test switch (demo accounts only; the server ignores it for everyone else): ?demoFault=timeout|balance|invalid|save
+  const fault = typeof window === "undefined" ? undefined : faultFromUrl(window.location.search);
   const q = useQuery({
     queryKey: ["demo-matches", wantId, km, need, missing, backup ? `b:${planCreatedAt ?? ""}` : "plan"],
-    queryFn: () => fn({ data: { wantId, km, mode: "auto", ...(backup ? { backup: true } : {}) } }),
+    queryFn: () => fn({ data: { wantId, km, mode: "auto", ...(backup ? { backup: true } : {}), ...(fault ? { fault } : {}) } }),
     staleTime: Infinity,
     retry: false,
     refetchOnWindowFocus: false,
@@ -114,7 +121,12 @@ export function DemoMaker({ wantId, km, need, missing, backup, planCreatedAt, on
     if (busy || !ensureOnline()) return;
     setBusy(true);
     try {
-      setManual(await fn({ data: { wantId, km, mode, ...(backup ? { backup: true } : {}) } }));
+      const r = await fn({ data: { wantId, km, mode, ...(backup ? { backup: true } : {}), ...(fault ? { fault } : {}) } });
+      if (!r.ok && r.pending) {
+        // Another tap or tab is already creating it: follow that one instead of waiting forever.
+        setManual(null);
+        void q.refetch();
+      } else setManual(r);
     } catch (e) {
       toast.error(errMessage(e));
     } finally {
@@ -184,8 +196,9 @@ export function SimOwnerActions({ r, onDone, showMeet }: { r: SimReq; onDone?: (
     if (busy || !ensureOnline()) return;
     setBusy(action);
     try {
-      await fn({ data: { requestId: r.id, action } });
-      toast.success(ok);
+      const res = await fn({ data: { requestId: r.id, action } });
+      if (res.ok) toast.success(ok);
+      else toast.error(res.message);
     } catch (e) {
       toast.error(errMessage(e));
     } finally {

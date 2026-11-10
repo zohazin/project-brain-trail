@@ -377,6 +377,7 @@ export const demoMatches = createServerFn({ method: "POST" })
         km: z.number().min(0.5).max(100),
         mode: z.enum(["auto", "retry", "another"]),
         backup: z.boolean().optional(),
+        fault: z.enum(["timeout", "balance", "invalid", "save"]).optional(),
       })
       .parse(d),
   )
@@ -386,7 +387,8 @@ export const demoMatches = createServerFn({ method: "POST" })
     if (w.error || !w.data) throw new Error("Not found");
     const { demoPlan } = await import("./demo-gen.server");
     const km = data.backup ? Number(w.data.search_km) : data.km;
-    const out = await demoPlan({ borrowerId: context.userId, wantId: data.wantId, km, mode: data.mode });
+    // `fault` is a presenter test switch; demoPlan refuses every non-demo account before reaching it.
+    const out = await demoPlan({ borrowerId: context.userId, wantId: data.wantId, km, mode: data.mode, fault: data.fault });
     if (data.backup && out.ok && out.created) {
       const { prepareBackup } = await import("./plan.server");
       const reason = (w.data.pending_plan as Plan | null)?.reason ?? "An owner can't lend.";
@@ -394,6 +396,8 @@ export const demoMatches = createServerFn({ method: "POST" })
     }
     return out;
   });
+
+export const UNAVAILABLE = "Someone else booked this item for these times first, so it isn't available. Nothing was booked for you; a replacement search is ready.";
 
 /** Presenter controls for a simulated demo owner. They run the normal booking rules as that owner. */
 export const simOwnerAction = createServerFn({ method: "POST" })
@@ -410,6 +414,17 @@ export const simOwnerAction = createServerFn({ method: "POST" })
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const r = await supabaseAdmin.rpc("sim_owner_act", { _req: data.requestId, _presenter: context.userId, _action: data.action });
+    if (r.error && data.action === "accept" && /enough free/i.test(r.error.message)) {
+      // Lost a race: another borrower's booking took the stock first. The owner can't lend, so the normal decline runs
+      // and a replacement for only this amount is offered. The other booking is untouched.
+      const d = await supabaseAdmin.rpc("sim_owner_act", { _req: data.requestId, _presenter: context.userId, _action: "decline" });
+      if (!d.error) {
+        const { prepareBackup } = await import("./plan.server");
+        const b = before.data;
+        await prepareBackup(b.want_id, `${b.owner_name || "An owner"}'s ${b.item_name.toLowerCase()} was booked by someone else for these times.`);
+      }
+      return { ok: false as const, status: "unavailable", message: UNAVAILABLE };
+    }
     if (r.error) throw new Error(r.error.message);
     const status = String((r.data as { status?: string } | null)?.status ?? "");
     if (data.action === "accept" && status === "expired") {
@@ -421,7 +436,7 @@ export const simOwnerAction = createServerFn({ method: "POST" })
       const unit = b.unit === "item" ? b.item_name.toLowerCase() : `${b.unit} of ${b.item_name.toLowerCase()}`;
       await prepareBackup(b.want_id, `${b.owner_name || "An owner"} can't lend ${Number(b.quantity)} ${unit}.`);
     }
-    return { ok: true, status };
+    return { ok: true as const, status, message: null };
   });
 
 // Owner answers an exception (distance) first; this is separate from saying yes to the booking.
