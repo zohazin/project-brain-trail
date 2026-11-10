@@ -159,6 +159,65 @@ export type Database = {
           },
         ]
       }
+      demo_generations: {
+        Row: {
+          borrower_id: string
+          created_at: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          item_ids: string[]
+          missing: number
+          model: string | null
+          owner_ids: string[]
+          proposal: Json | null
+          round: number
+          status: string
+          version_key: string
+          want_id: string
+        }
+        Insert: {
+          borrower_id: string
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          item_ids?: string[]
+          missing: number
+          model?: string | null
+          owner_ids?: string[]
+          proposal?: Json | null
+          round?: number
+          status?: string
+          version_key: string
+          want_id: string
+        }
+        Update: {
+          borrower_id?: string
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          item_ids?: string[]
+          missing?: number
+          model?: string | null
+          owner_ids?: string[]
+          proposal?: Json | null
+          round?: number
+          status?: string
+          version_key?: string
+          want_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_generations_want_id_fkey"
+            columns: ["want_id"]
+            isOneToOne: false
+            referencedRelation: "wants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       items: {
         Row: {
           accessories: string
@@ -174,8 +233,10 @@ export type Database = {
           condition: string
           created_at: string
           description: string
+          generation_id: string | null
           id: string
           is_demo: boolean
+          is_generated: boolean
           kind: string
           lat: number
           lng: number
@@ -196,6 +257,7 @@ export type Database = {
           summary_stale: boolean
           unit: string
           updated_at: string
+          why_it_matches: string
         }
         Insert: {
           accessories?: string
@@ -211,8 +273,10 @@ export type Database = {
           condition?: string
           created_at?: string
           description?: string
+          generation_id?: string | null
           id?: string
           is_demo?: boolean
+          is_generated?: boolean
           kind?: string
           lat: number
           lng: number
@@ -233,6 +297,7 @@ export type Database = {
           summary_stale?: boolean
           unit?: string
           updated_at?: string
+          why_it_matches?: string
         }
         Update: {
           accessories?: string
@@ -248,8 +313,10 @@ export type Database = {
           condition?: string
           created_at?: string
           description?: string
+          generation_id?: string | null
           id?: string
           is_demo?: boolean
+          is_generated?: boolean
           kind?: string
           lat?: number
           lng?: number
@@ -270,6 +337,7 @@ export type Database = {
           summary_stale?: boolean
           unit?: string
           updated_at?: string
+          why_it_matches?: string
         }
         Relationships: []
       }
@@ -450,6 +518,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_demo_results: boolean
           area_name: string | null
           avatar_path: string | null
           city: string
@@ -458,6 +527,7 @@ export type Database = {
           id: string
           identity_status: string
           is_demo: boolean
+          is_simulated: boolean
           lat: number | null
           lng: number | null
           onboarded: boolean
@@ -469,6 +539,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_demo_results?: boolean
           area_name?: string | null
           avatar_path?: string | null
           city?: string
@@ -477,6 +548,7 @@ export type Database = {
           id: string
           identity_status?: string
           is_demo?: boolean
+          is_simulated?: boolean
           lat?: number | null
           lng?: number | null
           onboarded?: boolean
@@ -488,6 +560,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_demo_results?: boolean
           area_name?: string | null
           avatar_path?: string | null
           city?: string
@@ -496,6 +569,7 @@ export type Database = {
           id?: string
           identity_status?: string
           is_demo?: boolean
+          is_simulated?: boolean
           lat?: number | null
           lng?: number | null
           onboarded?: boolean
@@ -731,6 +805,7 @@ export type Database = {
           quantity: number
           return_at: string | null
           returned_qty: number
+          simulated: boolean
           status: string
           terms_version: number
           total_rs: number
@@ -769,6 +844,7 @@ export type Database = {
           quantity: number
           return_at?: string | null
           returned_qty?: number
+          simulated?: boolean
           status?: string
           terms_version?: number
           total_rs?: number
@@ -807,6 +883,7 @@ export type Database = {
           quantity?: number
           return_at?: string | null
           returned_qty?: number
+          simulated?: boolean
           status?: string
           terms_version?: number
           total_rs?: number
@@ -1129,6 +1206,7 @@ export type Database = {
       }
       fmt_time: { Args: { t: string }; Returns: string }
       fmt_ts: { Args: { t: string }; Returns: string }
+      generated_item_ids: { Args: { _ids: string[] }; Returns: string[] }
       has_area_role: {
         Args: {
           _area: string
@@ -1356,6 +1434,10 @@ export type Database = {
           _req: string
         }
         Returns: string
+      }
+      sim_owner_act: {
+        Args: { _action: string; _presenter: string; _req: string }
+        Returns: Json
       }
       start_review: { Args: { _id: string }; Returns: undefined }
       unread_counts: {

@@ -554,3 +554,84 @@ ${SPEAKER_RULES}
     { timeoutMs: 20_000, maxOutput: 900 },
   );
 }
+
+// ---------------- AI demo results (demo accounts only) ----------------
+export type DemoProposal = { listings: import("./demo-gen").DemoListingDraft[] };
+
+/**
+ * Proposes 1–3 fictional neighbour listings that cover only the missing amount of a demo search.
+ * Everything is checked again on the server (and by the database) before anything is saved.
+ */
+export async function proposeDemoListings(input: {
+  need: import("./demo-gen").DemoNeed;
+  summary: string;
+  details: string | null;
+  purpose: string | null;
+  pickupLocal: string;
+  returnLocal: string | null;
+  alreadyFound: number;
+  avoidNames: string[];
+  problems?: string[];
+}): Promise<DemoProposal> {
+  const n = input.need;
+  const instructions = `You create FICTIONAL sample listings for a demo of a neighbourhood borrowing app in Multan, Pakistan.
+They are clearly labelled as fictional to the presenter. Make them realistic, specific and useful.
+Create 1 to 3 listings from different fictional neighbours that together have at least the missing amount.
+- If the missing amount is 4 or more countable items, split it across 2 or 3 owners so that no single owner has all of it (for example 5 = 3 + 2).
+- If the missing amount is small (1 to 3 items, or a supply amount), one owner is enough.
+- item_name: plain English name of the right item (the same kind of thing the person needs, not an accessory or a different tool).
+- Reusable tools and their supplies are different things: a glue gun is borrowed and returned; glue sticks are used up.
+- Every must-have feature must be written plainly in description or specs (copy the feature words), and listed in "meets".
+- Realistic specs for the item (sizes, wattage, material, what is included), a short condition note, accessories (or "" if none).
+- owner_first_name: a common Pakistani first name, unique, not one of: ${[...input.avoidNames].join(", ")}.
+- quantity: what this owner has (whole numbers for countable items).
+- Prices in rupees, realistic for lending between neighbours. Countable items: price_rs per item (price_per 1), price_period "day" or "each". Supplies: price_rs per price_per units, price_period "each". Budget zero means price_rs 0. If a budget is given, the total for the missing amount must stay within it.
+- distance_km: between 0.3 and ${(n.search_km - 0.2).toFixed(1)}. owner_limit_km: at least distance_km + 0.5, at most 15.
+- available_from / available_until: "HH:MM" 24-hour Pakistan time that includes the pickup time${n.kind === "return" && n.return_at ? " and the return time" : ""}.
+- why_it_matches: one short sentence for the presenter. summary: one private English sentence with type, size and key specs.
+- Never include phone numbers, emails, links, addresses or real shop names.`;
+  const text = `Need: ${input.summary}
+Item: ${n.item_name} (${n.kind === "return" ? "borrow and return" : "supply that gets used up"}), unit: ${n.unit}
+Missing amount to cover: ${n.missing} ${n.unit === "item" ? "" : n.unit}${input.alreadyFound ? ` (${input.alreadyFound} already found from other owners)` : ""}
+Must-have features: ${n.requirements.length ? JSON.stringify(n.requirements) : "none"}
+Other details: ${input.details ?? "none"}${input.purpose ? `\nUse: ${input.purpose}` : ""}
+Pickup: ${input.pickupLocal}${input.returnLocal ? `\nReturn: ${input.returnLocal}` : ""}
+Budget: ${n.budget_rs == null ? "not given" : `Rs ${n.budget_rs} in total`}
+Search distance: within ${n.search_km} km${input.problems?.length ? `\n\nYour previous answer was rejected for these reasons. Fix all of them:\n- ${input.problems.join("\n- ")}` : ""}`;
+  const listing = {
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "owner_first_name", "item_name", "category", "description", "specs", "accessories", "condition", "quantity",
+      "price_rs", "price_per", "price_period", "distance_km", "owner_limit_km", "available_from", "available_until",
+      "meets", "why_it_matches", "summary",
+    ],
+    properties: {
+      owner_first_name: { type: "string" },
+      item_name: { type: "string" },
+      category: { type: "string" },
+      description: { type: "string" },
+      specs: { type: "string" },
+      accessories: { type: "string" },
+      condition: { type: "string" },
+      quantity: { type: "number" },
+      price_rs: { type: "number" },
+      price_per: { type: "number" },
+      price_period: { type: "string", enum: ["each", "day"] },
+      distance_km: { type: "number" },
+      owner_limit_km: { type: "number" },
+      available_from: { type: "string" },
+      available_until: { type: "string" },
+      meets: { type: "array", items: { type: "string" } },
+      why_it_matches: { type: "string" },
+      summary: { type: "string" },
+    },
+  };
+  return askJson<DemoProposal>(
+    "demo_listings",
+    instructions,
+    [{ type: "input_text", text }],
+    { type: "object", additionalProperties: false, required: ["listings"], properties: { listings: { type: "array", items: listing } } },
+    { timeoutMs: 45_000, maxOutput: 3000 },
+  );
+}

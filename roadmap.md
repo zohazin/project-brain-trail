@@ -81,3 +81,13 @@
 - [x] 3. Live check: 200, openai/gpt-6-astra
 - [x] 4. Live tests: DM, faraway, thank-you, Find chair + replacement — all PASS
 - [x] 5. Tests 86/86, published
+
+## AI demo results (input9218.txt; request7618.txt re-sent) — in progress
+- [x] Database: simulated owners, AI-created listings, generation log, demo owner actions (0014)
+- [ ] Live AI creates 1–3 fictional owners/listings for the shortfall only (demo accounts only), checked by the server before saving
+- [ ] Labels: "AI demo result", "Fictional demo listing", "Simulated owner", "Sample photo unavailable"; one-time explanation
+- [ ] Reuse saved results; no duplicate generations; "Create another sample plan"; Try again after failure
+- [ ] Demo actions for simulated owners: accept, decline (replacement), confirm pickup, confirm return, share meeting time
+- [ ] Profile switch "Show AI demo results"; reset removes all AI-created demo records
+- [ ] Rule tests + real-screen tests (glue gun, partial stock, split, decline, partial return, Shayari, normal account, reset)
+- [ ] Demo guide, chat.md, publish
