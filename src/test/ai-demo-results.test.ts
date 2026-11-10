@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkDemoListings, demoVersionKey, mentions, placeAt, shareShortfall, timeFits, type DemoListingDraft, type DemoNeed } from "@/lib/demo-gen";
+import { checkDemoListings, demoVersionKey, generationDecision, mentions, placeAt, shareShortfall, timeFits, type DemoListingDraft, type DemoNeed } from "@/lib/demo-gen";
 import { kmBetween } from "@/lib/areas";
 
 // Sunday 15 Nov 2026, 1 PM → 6 PM Pakistan time
@@ -114,5 +114,30 @@ describe("AI demo results: reuse and placement", () => {
   it("distance wording in must-haves is left to the search, not the listing text", () => {
     const n = { ...need, requirements: ["within 5 km", "full-size"] };
     expect(checkDemoListings([listing({ quantity: 5, description: "Full-size hot glue gun, 40 W." })], n).ok).toBe(true);
+  });
+});
+
+describe("sample plan retries (controlled failures)", () => {
+  const now = Date.parse("2026-11-10T20:00:00Z");
+  const at = (msAgo: number) => new Date(now - msAgo).toISOString();
+  it("reuses a saved set when a retry follows a lost answer", () => {
+    expect(generationDecision({ status: "ready", created_at: at(5_000) }, "retry", now)).toBe("reuse");
+    expect(generationDecision({ status: "ready", created_at: at(5_000) }, "auto", now)).toBe("reuse");
+  });
+  it("only 'Create another sample plan' replaces a saved set", () => {
+    expect(generationDecision({ status: "ready", created_at: at(5_000) }, "another", now)).toBe("create");
+  });
+  it("waits for a creation that is still running instead of starting a second one", () => {
+    expect(generationDecision({ status: "running", created_at: at(30_000) }, "retry", now)).toBe("pending");
+  });
+  it("clears a creation that never finished before trying again", () => {
+    expect(generationDecision({ status: "running", created_at: at(5 * 60_000) }, "auto", now)).toBe("abandon_then_create");
+  });
+  it("a page load after a failure shows it; only Try again makes a new attempt", () => {
+    expect(generationDecision({ status: "failed", created_at: at(1_000) }, "auto", now)).toBe("show_failure");
+    expect(generationDecision({ status: "failed", created_at: at(1_000) }, "retry", now)).toBe("create");
+  });
+  it("an invalid AI answer (no listings) is refused", () => {
+    expect(checkDemoListings([], need).ok).toBe(false);
   });
 });

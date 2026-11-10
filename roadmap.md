@@ -96,8 +96,8 @@
 
 ## Final MVP pass (instruction9187.txt) — 2026-11-10
 - [x] A. Current state: live app has AI demo results (checked live files); source 7d93ea5
-- [ ] B1. Controlled AI failure (timeout / no balance / bad output / connection lost) — demo-only, no orphans, reuse after uncertain retry
-- [ ] B2. Two demo borrowers race for one fictional item — only one wins
+- [x] B1. Controlled AI failure (timeout / no balance / bad output / save cut off / offline) — demo-only `?demoFault=`, no orphans, retry reuses saved set
+- [x] B2. Two demo borrowers race for one fictional item — only one wins; loser sees clear message + replacement
 - [ ] C. Full five-glue-gun run across every owner (live AI)
 - [ ] D. Normal member end-to-end (signup, listing+photo, pause/resume, request, chat, pickup/return, review)
 - [ ] E. Request edits + generation reuse; 250 g × Rs 80/100 g = Rs 200

@@ -589,7 +589,7 @@ Create 1 to 3 listings from different fictional neighbours that together have at
 - Prices in rupees, realistic for lending between neighbours. Countable items: price_rs per item (price_per 1), price_period "day" or "each". Supplies: price_rs per price_per units, price_period "each". Budget zero means price_rs 0. If a budget is given, the total for the missing amount must stay within it.
 - distance_km: between 0.3 and ${(n.search_km - 0.2).toFixed(1)}. owner_limit_km: at least distance_km + 0.5, at most 15.
 - available_from / available_until: "HH:MM" 24-hour Pakistan time that includes the pickup time${n.kind === "return" && n.return_at ? " and the return time" : ""}.
-- why_it_matches: one short sentence for the presenter. summary: one private English sentence with type, size and key specs.
+- why_it_matches: one short sentence for the presenter about why the ITEM suits the need (type, size, features). No dates, times, prices or amounts — the app shows those from its own checks. summary: one private English sentence with type, size and key specs.
 - Never include phone numbers, emails, links, addresses or real shop names.`;
   const text = `Need: ${input.summary}
 Item: ${n.item_name} (${n.kind === "return" ? "borrow and return" : "supply that gets used up"}), unit: ${n.unit}

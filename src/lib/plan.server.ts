@@ -218,25 +218,29 @@ export async function buildPlan(want: Want, km: number): Promise<Plan> {
   base.overBudget = budget != null && budget > 0 && base.total > budget;
   base.explanation = explainPlan(base, (want.item_name ?? "items").toLowerCase(), want.unit);
   base.checks = stillToCheck(base.lines, cands);
-  await markGenerated(db, [...base.lines, ...base.exceptions], base);
+  await markGenerated(db, [...base.lines, ...base.exceptions], base, want.id);
   return base;
 }
 
 /** Labels fictional AI demo listings so they are never shown as real neighbours. */
-async function markGenerated(db: DB, lines: PlanLine[], plan: Plan) {
+async function markGenerated(db: DB, lines: PlanLine[], plan: Plan, wantId: string) {
   if (lines.length === 0) return;
   const { data } = await db
     .from("items")
-    .select("id, why_it_matches, created_at")
+    .select("id, why_it_matches, created_at, generation_id")
     .in("id", lines.map((l) => l.item_id))
     .eq("is_generated", true);
   if (!data?.length) return;
   const gen = new Map(data.map((d) => [d.id, d]));
+  // The AI's one-line reason was written for the search that created the listing; another search gets the checked reasons only.
+  const genIds = Array.from(new Set(data.map((d) => d.generation_id).filter((g): g is string => Boolean(g))));
+  const { data: mine } = genIds.length ? await db.from("demo_generations").select("id").in("id", genIds).eq("want_id", wantId) : { data: [] };
+  const own = new Set((mine ?? []).map((m) => m.id));
   for (const l of lines) {
     const g = gen.get(l.item_id);
     if (!g) continue;
     l.generated = true;
-    l.why = g.why_it_matches || undefined;
+    l.why = g.generation_id && own.has(g.generation_id) ? g.why_it_matches || undefined : undefined;
   }
   plan.demoCreatedAt = data.map((d) => d.created_at).sort()[0];
 }

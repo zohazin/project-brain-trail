@@ -7,6 +7,7 @@ import type { Plan } from "./plan-types";
 import {
   checkDemoListings,
   demoVersionKey,
+  generationDecision,
   MAX_GENERATIONS_PER_DAY,
   MAX_ROUNDS_PER_SEARCH,
   placeAt,
@@ -220,19 +221,13 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
     .order("round", { ascending: false })
     .limit(1);
   const last = prev?.[0];
-  const fresh = last ? Date.now() - new Date(last.created_at).getTime() < STALE_MS : false;
-  if (last?.status === "running" && fresh) return { ok: false, pending: true };
-  if (last?.status === "running" && !fresh) await abandon(db, last.id); // a creation that never finished: clear its leftovers
-  // A ready result is reused for "auto" and also for "retry": a retry after a lost answer must not create a second set.
-  if (last?.status === "ready" && args.mode !== "another") {
+  const step = generationDecision(last, args.mode, Date.now(), STALE_MS);
+  if (step === "pending") return { ok: false, pending: true };
+  if (step === "abandon_then_create" && last) await abandon(db, last.id); // a creation that never finished: clear its leftovers
+  if (step === "reuse") {
     return { ok: true, plan, created: false, note: "The saved sample listings don't cover everything for these details. You can create another sample plan." };
   }
-  if (last && args.mode === "auto") {
-    if (last.status === "ready") {
-      return { ok: true, plan, created: false, note: "The saved sample listings don't cover everything for these details. You can create another sample plan." };
-    }
-    if (last.status === "failed") return { ok: false, aiError: last.error ?? NOT_FIT, retryAfter: null };
-  }
+  if (step === "show_failure") return { ok: false, aiError: last?.error ?? NOT_FIT, retryAfter: null };
 
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const [{ count: rounds }, { count: today }] = await Promise.all([

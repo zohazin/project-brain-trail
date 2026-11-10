@@ -195,3 +195,24 @@ export function placeAt(lat: number, lng: number, km: number, bearing: number): 
   const l2 = l1 + Math.atan2(Math.sin(br) * Math.sin(dr) * Math.cos(p1), Math.cos(dr) - Math.sin(p1) * Math.sin(p2));
   return { lat: (p2 * 180) / Math.PI, lng: (l2 * 180) / Math.PI };
 }
+
+/**
+ * What to do with the last saved creation for the same search version.
+ * - pending: another tap or tab is creating it right now.
+ * - reuse: a finished set exists; "auto" (page load) and "retry" (after a lost answer) never make a second set.
+ * - show_failure: page load after a failure shows it; only the person's "Try again" makes a new attempt.
+ * - create: make a new set ("abandon" first when an old attempt never finished).
+ */
+export function generationDecision(
+  last: { status: string; created_at: string } | null | undefined,
+  mode: "auto" | "retry" | "another",
+  now: number,
+  staleMs = 120_000,
+): "pending" | "reuse" | "show_failure" | "create" | "abandon_then_create" {
+  if (!last) return "create";
+  const fresh = now - new Date(last.created_at).getTime() < staleMs;
+  if (last.status === "running") return fresh ? "pending" : "abandon_then_create";
+  if (last.status === "ready" && mode !== "another") return "reuse";
+  if (last.status === "failed" && mode === "auto") return "show_failure";
+  return "create";
+}
