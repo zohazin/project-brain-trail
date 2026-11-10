@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_events: {
+        Row: {
+          code: string | null
+          created_at: string
+          feature: string
+          http_status: number | null
+          id: string
+          kind: string
+          model: string | null
+          retry_after: number | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          feature: string
+          http_status?: number | null
+          id?: string
+          kind: string
+          model?: string | null
+          retry_after?: number | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          feature?: string
+          http_status?: number | null
+          id?: string
+          kind?: string
+          model?: string | null
+          retry_after?: number | null
+        }
+        Relationships: []
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -281,26 +314,42 @@ export type Database = {
           client_id: string | null
           created_at: string
           id: string
+          kind: string
+          preview_id: string | null
           request_id: string
           sender_id: string | null
+          shayari: Json | null
         }
         Insert: {
           body: string
           client_id?: string | null
           created_at?: string
           id?: string
+          kind?: string
+          preview_id?: string | null
           request_id: string
           sender_id?: string | null
+          shayari?: Json | null
         }
         Update: {
           body?: string
           client_id?: string | null
           created_at?: string
           id?: string
+          kind?: string
+          preview_id?: string | null
           request_id?: string
           sender_id?: string | null
+          shayari?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_preview_id_fkey"
+            columns: ["preview_id"]
+            isOneToOne: true
+            referencedRelation: "shayari_previews"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_request_id_fkey"
             columns: ["request_id"]
@@ -413,6 +462,8 @@ export type Database = {
           lng: number | null
           onboarded: boolean
           restricted: boolean
+          shayari_language: string
+          shayari_tone: string
           test_cnic: string | null
           travel_km: number
           updated_at: string
@@ -430,6 +481,8 @@ export type Database = {
           lng?: number | null
           onboarded?: boolean
           restricted?: boolean
+          shayari_language?: string
+          shayari_tone?: string
           test_cnic?: string | null
           travel_km?: number
           updated_at?: string
@@ -447,6 +500,8 @@ export type Database = {
           lng?: number | null
           onboarded?: boolean
           restricted?: boolean
+          shayari_language?: string
+          shayari_tone?: string
           test_cnic?: string | null
           travel_km?: number
           updated_at?: string
@@ -665,6 +720,7 @@ export type Database = {
           item_photo: string | null
           kind: string
           note: string | null
+          note_shayari: Json | null
           owner_id: string
           owner_name: string
           payment_confirmed_by: string | null
@@ -702,6 +758,7 @@ export type Database = {
           item_photo?: string | null
           kind: string
           note?: string | null
+          note_shayari?: Json | null
           owner_id: string
           owner_name?: string
           payment_confirmed_by?: string | null
@@ -739,6 +796,7 @@ export type Database = {
           item_photo?: string | null
           kind?: string
           note?: string | null
+          note_shayari?: Json | null
           owner_id?: string
           owner_name?: string
           payment_confirmed_by?: string | null
@@ -769,6 +827,87 @@ export type Database = {
             columns: ["want_id"]
             isOneToOne: false
             referencedRelation: "wants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shayari_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shayari_previews: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+          item_id: string | null
+          key_message: string
+          language: string
+          lines: string[]
+          meaning: string
+          original: string
+          request_id: string | null
+          source_key: string
+          tone: string
+          user_id: string
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          key_message: string
+          language: string
+          lines: string[]
+          meaning: string
+          original: string
+          request_id?: string | null
+          source_key: string
+          tone: string
+          user_id: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          key_message?: string
+          language?: string
+          lines?: string[]
+          meaning?: string
+          original?: string
+          request_id?: string | null
+          source_key?: string
+          tone?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shayari_previews_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shayari_previews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
             referencedColumns: ["id"]
           },
         ]
@@ -924,6 +1063,10 @@ export type Database = {
         }
         Returns: string
       }
+      booking_done: {
+        Args: { r: Database["public"]["Tables"]["requests"]["Row"] }
+        Returns: boolean
+      }
       can_admin_area: {
         Args: { _area: string; _reporter: string }
         Returns: boolean
@@ -994,6 +1137,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_contact: { Args: { _t: string }; Returns: boolean }
+      hide_word: { Args: { _t: string; _w: string }; Returns: string }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       is_demo_user: { Args: { _u: string }; Returns: boolean }
       is_party: { Args: { _req: string }; Returns: boolean }
@@ -1199,8 +1344,19 @@ export type Database = {
         Args: { _accept: boolean; _req: string; _version?: number }
         Returns: string
       }
+      scrub_contact: { Args: { _t: string }; Returns: string }
       send_reminder: { Args: { _req: string }; Returns: undefined }
       send_requests: { Args: { _allocs: Json; _want: string }; Returns: number }
+      send_rich_message: {
+        Args: {
+          _body: string
+          _client_id: string
+          _kind: string
+          _preview: string
+          _req: string
+        }
+        Returns: string
+      }
       start_review: { Args: { _id: string }; Returns: undefined }
       unread_counts: {
         Args: never
@@ -1209,6 +1365,7 @@ export type Database = {
           unread: number
         }[]
       }
+      western_digits: { Args: { _t: string }; Returns: string }
       withdraw_date_change: { Args: { _id: string }; Returns: undefined }
     }
     Enums: {

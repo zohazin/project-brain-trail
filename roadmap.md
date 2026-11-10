@@ -66,3 +66,10 @@
 - [x] Failure UI (unavailable/busy/timeout/invalid/balance) + admin status card
 - [ ] Live retests A–D and model comparison — blocked: workspace AI balance is 0
 - [ ] Physical-phone checks — needs a real phone
+
+## Import into this project (lovable-36845aad-2026-11-10.zip, query5371.txt) — 2026-11-10
+- [x] Copy all code unchanged, new Cloud backend, re-apply database steps 0000–0013, photos storage, email sign-in, hourly job
+- [x] Checks: 86 tests, build, demo sign-in, Find list, live AI question
+- [ ] Demo item photos (files not in the zip — need them, or skip)
+- [ ] Real member data from the old app (only if any existed — needs an export, or skip)
+- [ ] Publish this copy

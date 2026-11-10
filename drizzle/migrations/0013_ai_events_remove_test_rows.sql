@@ -1,0 +1,1 @@
+DELETE FROM public.ai_events WHERE code = 'TimeoutError' AND feature = 'shayari';
