@@ -44,7 +44,7 @@ function Notifications() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle sub="Requests, answers, reminders and messages.">Notifications</PageTitle>
         {unread.length > 0 && (
           <Button

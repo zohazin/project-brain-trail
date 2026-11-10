@@ -92,7 +92,7 @@ function TabsLayout() {
         <OfflineBanner />
         {/* Mobile header */}
         <header className="sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur md:hidden">
-          <Link to="/find" className="flex items-center gap-2">
+          <Link to="/find" className="flex min-w-0 items-center gap-2">
             <Logo />
             {me?.is_demo && <DemoTag />}
           </Link>
@@ -104,7 +104,7 @@ function TabsLayout() {
             )}
             <NotificationBell userId={userId} />
             <Link to="/profile" className="flex items-center gap-1.5 rounded-xl border px-3 py-2 font-semibold hover:bg-accent" aria-label="Profile and settings">
-              <UserRound className="h-5 w-5" aria-hidden /> <span className="text-sm">Profile</span>
+              <UserRound className="h-5 w-5" aria-hidden /> <span className="text-sm max-[359px]:sr-only">Profile</span>
             </Link>
           </div>
         </header>

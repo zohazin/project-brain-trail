@@ -549,6 +549,7 @@ function Handover({ r, iAmOwner, otherName, userId, condition }: { r: Req; iAmOw
             <Button disabled={busy || p <= picked} onClick={ownerConfirm}>
               Confirm {fmtQty(p, r.unit)} handed over
             </Button>
+            {!busy && p <= picked && <p className="text-sm text-muted-foreground">Press + to set how many you handed over.</p>}
           </div>
         ) : (
           <div className="space-y-2">
@@ -610,6 +611,9 @@ function Handover({ r, iAmOwner, otherName, userId, condition }: { r: Req; iAmOw
                 <Button disabled={busy || (p === picked && b === back && !closePickup)} onClick={ownerConfirm}>
                   Confirm
                 </Button>
+                {!busy && p === picked && b === back && !closePickup && (
+                  <p className="w-full text-sm text-muted-foreground">Change a number above to confirm what was handed over or came back.</p>
+                )}
                 {out > 0 && (
                   <Button
                     variant="outline"
@@ -646,6 +650,9 @@ function Handover({ r, iAmOwner, otherName, userId, condition }: { r: Req; iAmOw
                   <Button disabled={busy || b <= Math.max(back, claimBack)} onClick={() => borrowerReport(Math.max(picked, claimPick), b)}>
                     I returned {b}
                   </Button>
+                  {!busy && b <= Math.max(back, claimBack) && (
+                    <p className="text-sm text-muted-foreground">Already counted. Press + when you give back more.</p>
+                  )}
                 </div>
               ) : null}
             </>
@@ -1130,7 +1137,8 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
   outRef.current = outgoing;
   useEffect(() => {
     // Safe to repeat: each message has its own id, and the database keeps only one copy.
-    const retry = () => outRef.current.forEach((o) => void deliver(o));
+    // Messages refused for good (e.g. the chat was closed) are not resent; the person sees why and can remove them.
+    const retry = () => outRef.current.filter((o) => !o.error).forEach((o) => void deliver(o));
     window.addEventListener("online", retry);
     if (navigator.onLine) retry();
     return () => window.removeEventListener("online", retry);
@@ -1163,19 +1171,25 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
         return;
       }
       // Rhymes and thank-you cards go through the server, which checks the chat is still allowed (blocks, booking state).
+      // A stalled connection must not leave "Sending…" forever: give up after 20 s and offer "try again" (same id, so no duplicate).
+      const stop = AbortSignal.timeout(20_000);
       const { error } = o.kind
-        ? await supabase.rpc("send_rich_message", {
-            _req: r.id,
-            _client_id: o.clientId,
-            _kind: o.kind,
-            _preview: (o.previewId ?? null) as string,
-            _body: o.previewId ? "" : o.body,
-          })
-        : await supabase.from("messages").insert({ request_id: r.id, sender_id: userId, body: o.body, client_id: o.clientId });
+        ? await supabase
+            .rpc("send_rich_message", {
+              _req: r.id,
+              _client_id: o.clientId,
+              _kind: o.kind,
+              _preview: (o.previewId ?? null) as string,
+              _body: o.previewId ? "" : o.body,
+            })
+            .abortSignal(stop)
+        : await supabase.from("messages").insert({ request_id: r.id, sender_id: userId, body: o.body, client_id: o.clientId }).abortSignal(stop);
       // 23505 = this exact message was already saved by an earlier try: treat as sent.
       if (error && error.code !== "23505") {
-        const permanent = /closed|not allowed|only the borrower|paused|once the owner|not available|opens after/i.test(error.message);
-        setOutgoing((list) => list.map((x) => (x.clientId === o.clientId ? { ...x, state: "failed", error: permanent ? error.message : undefined } : x)));
+        const revoked = /row-level security|permission denied/i.test(error.message);
+        const permanent = revoked || /closed|not allowed|only the borrower|paused|once the owner|not available|opens after/i.test(error.message);
+        const why = revoked ? "This chat is closed now, so this message can't be sent." : error.message;
+        setOutgoing((list) => list.map((x) => (x.clientId === o.clientId ? { ...x, state: "failed", error: permanent ? why : undefined } : x)));
         return;
       }
       await qc.invalidateQueries({ queryKey: ["request", r.id] });
@@ -1457,6 +1471,9 @@ function Rate({ data, userId, iAmOwner, otherName }: { data: Bundle; userId: str
         >
           Save rating
         </Button>
+        {!busy && (person === 0 || (!iAmOwner && item === 0)) && (
+          <p className="text-sm text-muted-foreground">Tap the stars{iAmOwner ? "" : " for both questions"} to save.</p>
+        )}
       </div>
     </Card>
   );

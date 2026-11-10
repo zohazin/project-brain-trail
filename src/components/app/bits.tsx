@@ -10,7 +10,7 @@ export function ItemThumb({ url, name, className, emptyText }: { url: string | n
     return (
       <div className={cn("flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-secondary p-1 text-center text-secondary-foreground", className)}>
         <Package className="h-1/3 w-1/3 opacity-60" aria-hidden />
-        <span className="text-[10px] leading-tight">{emptyText}</span>
+        <span className="text-[11px] font-semibold leading-tight [overflow-wrap:anywhere]">{emptyText}</span>
       </div>
     );
   }

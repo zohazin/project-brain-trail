@@ -92,7 +92,7 @@
 - [x] Rule tests + real-screen tests (glue gun, partial stock, split, decline, partial return, Shayari, normal account, reset)
 - [x] Demo guide, chat.md, publish
 - [x] Second pass: exact spec wording, distance not a must-have, spec glue-gun example + final return + thank-you + rating + paid grams supply tested
-- [ ] Not forced live: AI failure on this feature; two borrowers racing for the last fictional item (both use existing safeguards)
+- [x] AI failure and the two-borrower race were tested live in the final pass (B1, B2)
 
 ## Final MVP pass (instruction9187.txt) — 2026-11-10
 - [x] A. Current state: live app has AI demo results (checked live files); source 7d93ea5
@@ -102,9 +102,9 @@
 - [x] D. Normal member end-to-end: setup + manual area, drill listing + photo, edit, pause/resume, live AI request, yes, chat, meeting, pickup/return confirmed, both reviews; no demo items seen (signup email not sent: test accounts made directly)
 - [x] E. Request edits: quantity, free→paid, distance (typed distance now sticks), dates, new must-have, reload during creation — reuse first, one creation per version; 250 g × Rs 80/100 g = Rs 200 (app + database)
 - [x] F. Shayari: DM in Urdu (phone, meaning below, right-to-left), faraway note (private details hidden in source/rhyme/meaning/owner view/notifications; leftover "call me on [hidden]" clauses now dropped), thank-you (Roman Urdu + English, desktop side by side), no reuse across chats, no duplicate, no rating/booking change
-- [ ] G. Network/account recovery checks
-- [ ] H. Phone layout + PWA checks
-- [ ] I. Demo reset + permission checks
+- [x] G. Network/account recovery: offline send+reconnect (1 copy), lost reply+retry (1 copy), stalled send stops after 20 s with retry, draft survives reload, missed alerts appear after reconnect, chat closed while queued shows reason and is not resent, sign-out clears device data; repeat taps on pickup/return/cancel count once
+- [x] H. Phone layout (320/360/390/1280 on 10 screens): fixed top bar and notifications header spilling on 320 px, larger "Sample photo unavailable", reasons under greyed-out pickup/return/rating/listing-hours buttons; install file, update reload and no private caching checked (real phone pending)
+- [x] I. Demo reset + permissions: reset restores 7 demo people/10 items, removes fictional owners/listings/rhymes, keeps real members; a reset during AI creation now leaves nothing behind (fixed); demo area admin cannot see or decide real reports; no self-admin; members cannot reset or prepare the demo
 - [ ] J. MVP document + README
 - [ ] K. Three-minute demo script + Q&A
 - [ ] L. Publish + live smoke test

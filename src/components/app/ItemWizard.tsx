@@ -417,6 +417,11 @@ export function ItemWizard({ userId, profile, item }: { userId: string; profile:
             <Button size="lg" className="w-full" disabled={d.avail_days.length === 0 || d.avail_end <= d.avail_start} onClick={next}>
               Next
             </Button>
+            {d.avail_days.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Pick at least one day.</p>
+            ) : d.avail_end <= d.avail_start ? (
+              <p className="text-sm text-muted-foreground">The end time must be after the start time.</p>
+            ) : null}
           </>
         )}
 

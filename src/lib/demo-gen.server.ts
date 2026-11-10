@@ -61,6 +61,8 @@ async function removeSimOwnerIfUnused(db: DB, ownerId: string) {
   if (!items && !reqs) await db.auth.admin.deleteUser(ownerId);
 }
 
+const RESET_DURING_RUN = "The demo was reset while this was being created, so nothing was added. Start a new search.";
+
 async function saveListings(db: DB, generationId: string, want: Want, need: DemoNeed, list: DemoListingDraft[], breakAfterFirst = false) {
   const itemIds: string[] = [];
   const ownerIds: string[] = [];
@@ -281,11 +283,21 @@ export async function demoPlan(args: { borrowerId: string; wantId: string; km: n
       await fail(NOT_FIT);
       return { ok: false, aiError: NOT_FIT, retryAfter: null };
     }
+    // A reset (or a stale-run cleanup) during the AI call removes or closes this run: then nothing may be saved.
+    const stillRunning = async () => Boolean((await db.from("demo_generations").select("id").eq("id", genId).eq("status", "running").maybeSingle()).data);
+    if (!(await stillRunning())) return { ok: false, problem: RESET_DURING_RUN };
     const made = await saveListings(db, genId, want, need, check.listings, args.fault === "save");
-    await db
+    const done = await db
       .from("demo_generations")
       .update({ status: "ready", item_ids: made.itemIds, owner_ids: made.ownerIds, proposal: check.listings, finished_at: new Date().toISOString() })
-      .eq("id", genId);
+      .eq("id", genId)
+      .eq("status", "running")
+      .select("id");
+    if (!done.data?.length) {
+      for (const id of made.itemIds) await db.from("items").delete().eq("id", id);
+      for (const id of made.ownerIds) await db.auth.admin.deleteUser(id);
+      return { ok: false, problem: RESET_DURING_RUN };
+    }
     plan = await buildPlan(want, args.km);
     return { ok: true, plan, created: true, note: plan.missing > 0 ? "Some fictional listings didn't pass the final check. You can create another sample plan." : null };
   } catch (e) {
