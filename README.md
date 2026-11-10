@@ -41,13 +41,13 @@ Demo accounts are fictional and only ever see each other (real members never see
 
 ### AI demo results (one device, any item)
 
-When the demo neighbours don't have enough, demo accounts get **fictional** owners and listings created live by AI for the missing amount only (labelled "AI demo result", "Fictional demo listing", "Simulated owner", "Sample photo unavailable"). Real members never see them.
+When the demo neighbours don't have enough, demo accounts get **fictional** owners and listings created live by AI for the missing amount only (labelled "AI demo results — fictional", "Demo item", "Simulated owner", "Sample photo unavailable"). Real members never see them.
 
-1. Ali → Find: `Sunday ko 5 glue guns chahiye, 1 baje le jaunga, shaam 6 baje wapas. Budget 600` → answer the detail question.
-2. AI creates e.g. Owner A 3 + Owner B 2 within budget, distance and times (checked by the server and the database). Saved results are reused on reload; **Create another sample plan** replaces them before sending.
+1. Ali → Find: `Budhwar shaam 5 baje 5 glue guns chahiye, Jumeraat shaam 5 baje wapas, budget zero` → answer the detail question (full-size or mini, sticks).
+2. AI creates e.g. Owner A 3 + Owner B 2, free, within, distance and times (checked by the server and the database). Saved results are reused on reload; **Create another sample plan** replaces them before sending.
 3. Send → **Simulate owner accepting** / **Simulate owner declining** (a no brings a replacement for only the missing amount, approved by Ali).
 4. Booking: **I collected these items** → **Confirm pickup as owner**; return fewer → **Confirm return as owner** ("1 still due"); **Owner shares a meeting time**; chat and Make it rhyme work as usual.
-5. Profile → **Show AI demo results** switches it off. **Reset demo data** removes every fictional owner, listing and booking.
+5. Profile → **AI demo results** switch turns it off. **Reset demo data** removes every fictional owner, listing and booking.
 
 ## Published app
 

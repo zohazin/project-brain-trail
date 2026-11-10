@@ -2,6 +2,7 @@
 // Demo accounts only. Every label says plainly that these listings and owners are fictional.
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Bot, Check, Handshake, PackageCheck, RefreshCw, Sparkles, Undo2, X } from "lucide-react";
@@ -14,14 +15,15 @@ import { ensureOnline } from "@/hooks/use-app";
 import type { Plan } from "@/lib/plan-types";
 
 export const SAMPLE_PHOTO_TEXT = "Sample photo unavailable";
+export const FAIL_TEXT = "Couldn't create sample matches. Your request is saved.";
 
 export function AiDemoLabel({ className }: { className?: string }) {
   return (
     <span className={["inline-flex flex-wrap items-center gap-1", className].filter(Boolean).join(" ")}>
       <span className="inline-flex items-center gap-1 rounded-full bg-attention px-2 py-0.5 text-xs font-semibold text-foreground">
-        <Bot className="h-3.5 w-3.5" aria-hidden /> AI demo result
+        <Bot className="h-3.5 w-3.5" aria-hidden /> AI demo results — fictional
       </span>
-      <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Fictional demo listing</span>
+      <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Demo item</span>
     </span>
   );
 }
@@ -48,10 +50,8 @@ export function DemoIntro() {
       <p className="flex items-center gap-2 font-semibold">
         <Sparkles className="h-5 w-5" aria-hidden /> AI demo results
       </p>
-      <p className="text-sm">
-        In demo accounts, when the demo neighbours don't have enough, AI creates a few <strong>fictional</strong> owners and listings live for your request.
-        They are labelled, only demo accounts can see them, and you can act as their owner with the demo buttons. Real members never see them.
-      </p>
+      <p className="text-sm">If a match is missing, AI can create sample items so you can try the full app.</p>
+      <p className="text-sm text-muted-foreground">They are fictional, marked “Demo item”, and only demo accounts see them. You answer for their owners with the demo buttons.</p>
       <Button
         size="sm"
         variant="outline"
@@ -76,9 +76,10 @@ export function DemoPlanBanner({ plan, justCreated, canReplace, onAnother, busy 
     <div className="mt-3 space-y-2 rounded-xl border-2 border-dashed border-attention bg-attention-soft p-3 text-sm text-attention-foreground">
       <p className="font-semibold">
         <Bot className="mr-1 inline h-4 w-4" aria-hidden />
+        AI demo results — fictional.{" "}
         {justCreated ? "AI just created the fictional listings marked below for this demo." : `AI created the fictional listings marked below for this demo${plan.demoCreatedAt ? ` (${fmtShort(plan.demoCreatedAt)})` : ""}. They are saved, not made again.`}
       </p>
-      <p>Prices, distances and availability were checked by the app like any other listing. Nothing is booked until each owner says yes.</p>
+      <p>Owners, areas and distances are simulated. Prices and availability were checked by the app like any other listing. Nothing is booked until each owner says yes.</p>
       {canReplace && (
         <Button size="sm" variant="outline" disabled={busy} onClick={onAnother}>
           <RefreshCw className={busy ? "animate-spin" : ""} /> {busy ? "Creating…" : "Create another sample plan"}
@@ -131,18 +132,18 @@ export function DemoMaker({ wantId, km, need, missing, backup, planCreatedAt, on
       </Card>
     );
   }
-  if (q.isError) return <AiNotice message={errMessage(q.error)} onRetry={() => void run("retry")} retrying={busy} />;
+  const browse = (why: string) => (
+    <>
+      {why} Nothing was added or reserved.{" "}
+      <Link to="/find" className="font-semibold underline">
+        Browse demo items on Find
+      </Link>
+    </>
+  );
+  if (q.isError) return <AiNotice message={FAIL_TEXT} onRetry={() => void run("retry")} retrying={busy} next={browse(errMessage(q.error))} />;
   if (!out) return null;
   if (!out.ok && out.aiError) {
-    return (
-      <AiNotice
-        message={out.aiError}
-        retryAfter={out.retryAfter}
-        onRetry={() => void run("retry")}
-        retrying={busy}
-        next="No fictional listings were added and nothing is reserved. Real demo results above stay as they are."
-      />
-    );
+    return <AiNotice message={FAIL_TEXT} retryAfter={out.retryAfter} onRetry={() => void run("retry")} retrying={busy} next={browse(out.aiError)} />;
   }
   if (!out.ok && out.problem) {
     return (

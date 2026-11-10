@@ -270,9 +270,9 @@ function AiDemoSwitch({ userId, on }: { userId: string; on: boolean }) {
         }}
       />
       <label htmlFor="ai-demo-results" className="text-sm">
-        <span className="font-semibold">Show AI demo results</span>
+        <span className="font-semibold">AI demo results</span>
         <br />
-        When the demo neighbours don't have enough, AI creates fictional owners and listings live for your request. They are labelled and only demo accounts see them.
+        If a match is missing, AI can create sample items so you can try the full app. They are fictional, marked “Demo item”, and only demo accounts see them.
       </label>
     </div>
   );

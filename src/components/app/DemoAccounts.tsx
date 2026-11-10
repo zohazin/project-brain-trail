@@ -191,11 +191,11 @@ export function AiDemoSteps() {
       <h3 id="ai-demo" className="font-semibold">AI demo results (any item, one device)</h3>
       <ol className="mt-2 list-decimal space-y-1 pl-5">
         <li>
-          Sign in as <strong>Ali</strong>. On Find type, for example: <em>Sunday ko 5 glue guns chahiye, 1 baje le jaunga, shaam 6 baje wapas. Budget 600</em>. Answer
+          Sign in as <strong>Ali</strong>. On Find type, for example: <em>Budhwar shaam 5 baje 5 glue guns chahiye, Jumeraat shaam 5 baje wapas, budget zero</em>. Answer
           the one detail question (e.g. full-size, no glue sticks).
         </li>
         <li>
-          The demo neighbours have no glue guns, so AI creates 1–3 <strong>fictional</strong> owners live (e.g. 3 + 2), marked “AI demo result”, “Fictional demo listing”
+          The demo neighbours have no glue guns, so AI creates 1–3 <strong>fictional</strong> owners live (e.g. 3 + 2), marked “AI demo results — fictional”, “Demo item”
           and “Sample photo unavailable”. Prices, distance and times are checked by the app. Demo stock that fits is always used first.
         </li>
         <li>Tap Send. On each request use the demo buttons: “Simulate owner accepting” or “Simulate owner declining”. A no brings a replacement for only the missing amount.</li>
@@ -203,7 +203,7 @@ export function AiDemoSteps() {
           Open a booking: tap “I collected these items”, then “Confirm pickup as owner”. Return fewer, then “Confirm return as owner” to show “1 still due”. Try
           “Owner shares a meeting time” and Make it rhyme in the chat.
         </li>
-        <li>“Create another sample plan” makes a new one before you send. Profile → “Show AI demo results” turns this off. Reset removes every fictional owner and listing.</li>
+        <li>“Create another sample plan” makes a new one before you send. Profile → the “AI demo results” switch turns this off. Reset removes every fictional owner and listing.</li>
       </ol>
     </section>
   );

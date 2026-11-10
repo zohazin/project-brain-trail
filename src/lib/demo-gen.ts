@@ -99,6 +99,11 @@ function words(s: string): string[] {
     .filter((w) => w.length >= 3 && !STOP.has(w));
 }
 
+/** Distance, area or time wording is checked by the search itself, not by the listing text. */
+export function isSearchDetail(requirement: string): boolean {
+  return /\b(\d+(\.\d+)?\s*km|kilomet|within|nearby|near me|ke andar|distance|budget|pickup time|return time)\b/i.test(requirement);
+}
+
 /** A must-have counts as met only when the listing's own text mentions it. */
 export function mentions(requirement: string, text: string): boolean {
   const t = text.toLowerCase();
@@ -161,7 +166,7 @@ export function checkDemoListings(raw: DemoListingDraft[], need: DemoNeed): Demo
       problems.push(`${at}: availability ${l.available_from}–${l.available_until} must include pickup ${localHm(need.pickup_at)}${need.return_at && need.kind === "return" ? ` and return ${localHm(need.return_at)}` : ""}.`);
     }
     const text = `${l.item_name} ${l.description} ${l.specs} ${l.accessories}`;
-    for (const r of need.requirements) {
+    for (const r of need.requirements.filter((x) => !isSearchDetail(x))) {
       if (!mentions(r, text)) problems.push(`${at}: description or specs must clearly say it has "${r}".`);
     }
   });

@@ -111,4 +111,8 @@ describe("AI demo results: reuse and placement", () => {
     expect(mentions("HDMI input", "Epson projector with HDMI and VGA")).toBe(true);
     expect(mentions("HDMI input", "Epson projector, VGA only")).toBe(false);
   });
+  it("distance wording in must-haves is left to the search, not the listing text", () => {
+    const n = { ...need, requirements: ["within 5 km", "full-size"] };
+    expect(checkDemoListings([listing({ quantity: 5, description: "Full-size hot glue gun, 40 W." })], n).ok).toBe(true);
+  });
 });

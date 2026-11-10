@@ -522,6 +522,7 @@ function PlanRow({ line }: { line: PlanLine }) {
         {line.generated && line.why && <p className="text-sm">{line.why}</p>}
         <p className="flex items-center gap-1 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" aria-hidden /> Pickup near {line.area_name || "your area"} · {fmtDistance(line.distance_km)}
+          {line.generated ? " (simulated)" : ""}
         </p>
         <p className="text-sm text-muted-foreground">{priceLabel(line.kind, line.price_rs, line.price_per, line.unit, line.price_period, line.free_qty)}</p>
         {line.condition && <p className="text-sm text-muted-foreground">Condition: {line.condition}</p>}
@@ -780,7 +781,7 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
                 {r.simulated && (
                   <div className="mt-1 flex flex-wrap gap-1">
                     <SimulatedOwnerLabel />
-                    <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Fictional demo listing</span>
+                    <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Demo item</span>
                   </div>
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-2">

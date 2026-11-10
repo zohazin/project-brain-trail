@@ -91,4 +91,5 @@
 - [x] Profile switch "Show AI demo results"; reset removes all AI-created demo records
 - [x] Rule tests + real-screen tests (glue gun, partial stock, split, decline, partial return, Shayari, normal account, reset)
 - [x] Demo guide, chat.md, publish
-- [ ] AI failure on this feature not forced in a live test (same handling as other AI features)
+- [x] Second pass: exact spec wording, distance not a must-have, spec glue-gun example + final return + thank-you + rating + paid grams supply tested
+- [ ] Not forced live: AI failure on this feature; two borrowers racing for the last fictional item (both use existing safeguards)
