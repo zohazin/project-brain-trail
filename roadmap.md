@@ -131,3 +131,11 @@
 - [x] AI lender replies in the normal chat (own share, saved facts, one reply per message, Try again, rhymes)
 - [x] Phone-width end-to-end test, tests, publish
 - [ ] Real-phone check — needs a physical phone
+
+## Trial item photos (hub_prompt3085.txt) — in progress
+- [ ] Add licensed, relevant photos to existing and newly created trial listings; preserve real uploads
+- [ ] Show “Trial data” + “Illustrative photo”, consistent lazy-loaded images and failure fallback everywhere
+- [ ] Backfill existing trial listings, test browsing/search/details, publish
+
+## Latest request (prompt8236.txt) — in progress
+- [ ] Read and fold the new instructions into the current work
