@@ -20,6 +20,18 @@ Central reference for project context. Read this first in every session; update 
 - Not tested in this copy: email delivery, real phone install/GPS. (Shayari live tests and the Find chair walkthrough were done 2026-11-10 — see "AI billing check" below.)
 - **Published 2026-11-10: https://project-brain-trail.lovable.app** (returned 200 with the Cheez Udhaar title).
 
+## Trial mode + AI demo lenders (request5940.txt, 2026-11-11)
+- Request: a real member's 20-chair search found nothing (correct: real members never see demo items). Build a trial experience so anyone can try a full booking, with AI demo lenders that say yes and reply in the normal Inbox chat (also Shayari). Publishing allowed. Reported `src/App.tsx` / GitHub lines: App.tsx does not exist here; GitHub was already connected earlier.
+- Why the search was empty: the member (Zohazin) is a real account; demo chairs (Sara 12, Hina 8, Usman 8, Bilal 20) are demo-only. Bilal can't fit 5 PM because his lending hours end at 4 PM (rule kept).
+- Built:
+  - "Try with sample items" on an empty search and in Profile (real members only). Opens a **separate practice account** (fictional items + AI lenders); real listings/bookings are never used or changed. "Leave trial" (banner and Profile) restores the member's own account.
+  - Banner on every page: "Trial mode — fictional items and AI lenders." Listings/matches show "Trial data"; lenders show "AI demo lender — simulated person".
+  - Profile switch "Simulate lender acceptance and replies" (on by default). On: AI demo lenders say yes through the normal booking checks a moment after sending, and reply in chat. Off: demo buttons as before.
+  - AI lender chat replies: same language as the borrower, only from the saved listing/booking, knows its own share (e.g. 8 of 20, other 12 with another lender), points to "Change amount or dates" for changes, never claims pickup/return. One reply per message; failure shows "The demo lender couldn't reply. Your message is saved. Try again."
+  - Demo neighbours answer as AI lenders only for practice accounts; the presenter accounts (Ali etc.) keep the old two-device demo with real-demo owners.
+- Verified (phone width 390 px, test member Kashif → trial): 20 chairs Wed 5 PM–Thu 5 PM free → Sara 12 + Usman 8; both said yes automatically; chat in Roman Urdu answered correctly (8 only, other 12 elsewhere; time change → use the change button; "not written in listing" when unsure); a rhyme got a reply; blocked reply showed the failure line and Try again worked; reload made no duplicate replies; Leave trial returned to Kashif with only his real booking. 132 automatic tests pass.
+- Not tested: real phone, email delivery. Global "Reset demo data" (presenter accounts) also clears practice-account bookings.
+
 ## Remove Lovable badge request (task4920.txt, 2026-11-11)
 - Request: remove every Lovable badge/branding and add CSS hiding `#lovable-badge`. Reported `src/pages/NotFound.tsx(7,11)` error: file does not exist here; not applicable.
 - Checked: the app's own pages, footer, titles and share tags contain **no** Lovable name or link (author = "Cheez Udhaar"). The only branding on the live site is the "Edit with Lovable" badge that hosting adds on publish.
@@ -259,6 +271,7 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 | query7663.txt | Hackathon submission pass: verify GitHub, finalize MVP doc, SUBMISSION.md answers, live smoke test, judge demo, handoff |
 | task4920.txt | Remove Lovable badge/branding (blocked: Free plan) |
 | docs/SUBMISSION.md | Ready-to-copy submission form answers + checklist |
+| request5940.txt | Trial mode for real members + AI demo lenders in Inbox chat (20-chair case), test and publish |
 | request7618.txt | Fix AI 402 billing blocker (check workspace, move only if needed), live check, four live Shayari/Find tests, publish, hand off |
 
 ## Change History
@@ -279,3 +292,4 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 - User asked to connect GitHub and confirm sync. Reported error `src/App.tsx(17,16) TS2554`: file does not exist here; not applicable.
 - (Old status, now resolved — see "Hackathon submission pass".) The AI cannot connect Git sync. Waiting on the owner to connect (Project settings → Git → Connect; creates a NEW private repo; only the synced branch, usually `main`, syncs both ways).
 - How to confirm: after connecting, the repo's latest commit should match the latest Lovable commit; next AI edit should appear in GitHub within moments. Optionally the AI can read the repo via a GitHub data connection to compare commits.
+- 2026-11-11: request5940.txt — trial mode and AI demo lenders built, tested end-to-end and published (see section above).

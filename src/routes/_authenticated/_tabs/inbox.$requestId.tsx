@@ -1165,7 +1165,7 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
   }, [r.id, lastId, qc]);
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-  }, [lastId, outgoing.length]);
+  }, [lastId, outgoing.length, lender.signal]);
 
   // Messages already saved by the server are hidden from the "sending" list (no duplicates on retry).
   const saved = new Set(data.messages.map((m) => m.client_id).filter(Boolean));

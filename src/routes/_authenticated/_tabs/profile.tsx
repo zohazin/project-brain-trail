@@ -73,7 +73,7 @@ function Profile() {
 
   return (
     <div className="space-y-5">
-      <PageTitle sub={email}>My profile</PageTitle>
+      <PageTitle sub={p.trial_of ? "Practice account for trial mode" : email}>My profile</PageTitle>
       {p.restricted && (
         <Card tone="attention">
           <p className="font-semibold">Your account is paused after a review by your area admin.</p>

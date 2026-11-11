@@ -123,3 +123,11 @@
 - [ ] Fill placeholders and submit the form once — submitting member only
 
 - [ ] Hide the Lovable badge on the live site — blocked: needs a Pro plan, then the Hide badge setting
+
+## Trial mode + AI demo lenders (request5940.txt) — 2026-11-11
+- [x] Diagnose the empty 20-chair search (real account; demo items are demo-only; Bilal closes at 4 PM)
+- [x] "Try with sample items" practice account, banner, "Trial data" / "AI demo lender" labels, Leave trial
+- [x] Auto-accept setting (normal booking checks) + manual demo buttons when off
+- [x] AI lender replies in the normal chat (own share, saved facts, one reply per message, Try again, rhymes)
+- [x] Phone-width end-to-end test, tests, publish
+- [ ] Real-phone check — needs a physical phone

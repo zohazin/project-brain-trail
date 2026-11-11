@@ -195,13 +195,20 @@ export function AiDemoSteps() {
           the one detail question (e.g. full-size, no glue sticks).
         </li>
         <li>
-          The demo neighbours have no glue guns, so AI creates 1–3 <strong>fictional</strong> owners live (e.g. 3 + 2), marked “AI demo results — fictional”, “Demo item”
+          The demo neighbours have no glue guns, so AI creates 1–3 <strong>fictional</strong> owners live (e.g. 3 + 2), marked “AI demo results — fictional”, “Trial data”
           and “Sample photo unavailable”. Prices, distance and times are checked by the app. Demo stock that fits is always used first.
         </li>
-        <li>Tap Send. On each request use the demo buttons: “Simulate owner accepting” or “Simulate owner declining”. A no brings a replacement for only the missing amount.</li>
+        <li>
+          Tap Send. With Profile → “Simulate lender acceptance and replies” on, each AI demo lender says yes by itself and replies in the chat. Switch it off to use the demo
+          buttons instead: “Simulate owner accepting” or “Simulate owner declining”. A no brings a replacement for only the missing amount.
+        </li>
         <li>
           Open a booking: tap “I collected these items”, then “Confirm pickup as owner”. Return fewer, then “Confirm return as owner” to show “1 still due”. Try
           “Owner shares a meeting time” and Make it rhyme in the chat.
+        </li>
+        <li>
+          Real members: on a search with no results, or in Profile, tap <strong>Try with sample items</strong>. This opens a separate practice account (banner “Trial mode —
+          fictional items and AI lenders.”); demo neighbours there act as AI demo lenders. “Leave trial” returns to the member's own account, untouched.
         </li>
         <li>“Create another sample plan” makes a new one before you send. Profile → the “AI demo results” switch turns this off. Reset removes every fictional owner and listing.</li>
       </ol>

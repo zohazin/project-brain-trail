@@ -58,6 +58,8 @@ The AI **never** decides stock, availability, times, distance, price or who gets
 - **Simulated owner actions:** the presenter taps **Simulate owner accepting / declining**, **Confirm pickup as owner**, **Confirm return as owner** and **Owner shares a meeting time**. These run the same database rules as a real owner, acting as that fictional owner. Nothing happens automatically.
 - Profile → **AI demo results** switch turns this off. **Reset demo data** removes every fictional owner, listing and demo booking and never touches real members.
 
+**Trial mode for real members.** A real member whose search finds nothing (or from Profile) can tap “Try with sample items”. This opens a separate practice account — real listings, requests and chats are never used or changed — with the banner “Trial mode — fictional items and AI lenders.” Listings show “Trial data”; lenders show “AI demo lender — simulated person”. With “Simulate lender acceptance and replies” on, each lender says yes through the normal booking checks and replies in the booking chat with AI, using only the saved listing and booking (it knows its own share, e.g. 8 of 20 chairs) and pointing to “Change amount or dates” for any change. One reply per message; a failed reply shows “Try again”. “Leave trial” returns to the member's own account.
+
 ## 6. Card 2 — Shayari Mode
 
 "Make it rhyme" turns a message into **exactly two rhyming lines** plus a **plain meaning** shown underneath. The person chooses **Urdu, Roman Urdu or English** and **Friendly or Funny**.

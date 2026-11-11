@@ -399,7 +399,7 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
               <FitAndChecks plan={p} />
               <ul className="mt-3 divide-y">
                 {p.lines.map((l) => (
-                  <PlanRow key={l.item_id} line={l} />
+                  <PlanRow key={l.item_id} line={l} trial={Boolean(profile?.is_demo)} />
                 ))}
               </ul>
               <QuoteBox
@@ -526,12 +526,12 @@ function FitAndChecks({ plan }: { plan: Plan }) {
   );
 }
 
-function PlanRow({ line }: { line: PlanLine }) {
+function PlanRow({ line, trial }: { line: PlanLine; trial?: boolean }) {
   return (
     <li className="flex items-center gap-3 py-3">
       <ItemThumb url={line.photo_url} name={line.item_name} className="h-16 w-16 shrink-0" emptyText={line.generated ? SAMPLE_PHOTO_TEXT : undefined} />
       <div className="min-w-0 flex-1">
-        {line.generated && <AiDemoLabel className="mb-1" />}
+        {line.generated ? <AiDemoLabel className="mb-1" /> : trial ? <div className="mb-1"><TrialBadge /></div> : null}
         <p className="font-semibold">
           {line.label} · {fmtQty(line.quantity, line.unit)} {line.unit === "item" ? line.item_name.toLowerCase() : `of ${line.item_name.toLowerCase()}`}
         </p>
@@ -726,7 +726,7 @@ function Backup({ want, plan }: { want: Want; plan: Plan }) {
       </p>
       <ul className="mt-2 divide-y rounded-xl bg-card px-3">
         {plan.lines.map((l) => (
-          <PlanRow key={l.item_id} line={l} />
+          <PlanRow key={l.item_id} line={l} trial={Boolean(profile?.is_demo)} />
         ))}
       </ul>
       <QuoteBox className="mt-2" rows={plan.lines.map(toQuoteRow)} pickupAt={want.pickup_at} returnAt={want.kind === "return" ? want.return_at : null} budget={want.budget_rs == null ? null : Number(want.budget_rs)} />
@@ -755,14 +755,17 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
   const autoOn = Boolean(profile?.is_demo && profile.sim_auto);
   const waitingSim = live.filter((r) => r.simulated && r.status === "requested").map((r) => r.id).sort().join(",");
   const asked = useRef("");
+  const acceptRef = useRef(autoAccept);
+  acceptRef.current = autoAccept;
   const [simBusy, setSimBusy] = useState(false);
   useEffect(() => {
     if (!autoOn || !waitingSim || asked.current === waitingSim) return;
     asked.current = waitingSim;
     setSimBusy(true);
+    let live = true;
     const t = setTimeout(async () => {
       try {
-        const out = await autoAccept({ data: { wantId: want.id } });
+        const out = await acceptRef.current({ data: { wantId: want.id } });
         if (out.accepted.length) toast.success(out.accepted.length === 1 ? "The AI demo lender said yes. Open chat to talk." : `${out.accepted.length} AI demo lenders said yes. Open chat to talk.`);
         if (out.unavailable) toast.message("One item was booked by someone else first. A replacement search is ready.");
       } catch (e) {
@@ -773,8 +776,16 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
         await qc.invalidateQueries({ queryKey: ["activity"] });
       }
     }, 1500);
-    return () => clearTimeout(t);
-  }, [autoOn, waitingSim, want.id, autoAccept, qc]);
+    return () => {
+      // Left before the answer started: ask again next time this page opens.
+      clearTimeout(t);
+      if (live) {
+        live = false;
+        asked.current = "";
+        setSimBusy(false);
+      }
+    };
+  }, [autoOn, waitingSim, want.id, qc]);
   const confirmed = live.filter((r) => r.status === "confirmed" || r.status === "completed");
   const confirmedQty = confirmed.reduce((s, r) => s + Number(r.quantity), 0);
   const requestedQty = live.filter((r) => r.status === "requested").reduce((s, r) => s + Number(r.quantity), 0);

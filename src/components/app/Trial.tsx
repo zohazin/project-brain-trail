@@ -186,7 +186,9 @@ export function useDemoLender({ requestId, enabled, messages, borrowerId, lastId
     return null;
   }
   const wantsChange = new Set((rows.data ?? []).filter((r) => r.wants_change && r.reply_id).map((r) => r.reply_id!));
-  return { ask, statusFor, wantsChange };
+  /** Changes whenever a typing line or failure line appears or goes, so the chat can scroll to show it. */
+  const signal = `${Object.keys(waiting).join(",")}|${Object.keys(errors).join(",")}|${(rows.data ?? []).map((r) => r.status).join(",")}`;
+  return { ask, statusFor, wantsChange, signal };
 }
 
 /** Under a borrower message: typing indicator, or the failure line with Try again. */
