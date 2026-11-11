@@ -137,5 +137,5 @@
 - [ ] Show “Trial data” + “Illustrative photo”, consistent lazy-loaded images and failure fallback everywhere
 - [ ] Backfill existing trial listings, test browsing/search/details, publish
 
-## Latest request (prompt8236.txt) — in progress
+## Latest requests (prompt8236.txt, instruction3614.txt) — in progress
 - [ ] Read and fold the new instructions into the current work
