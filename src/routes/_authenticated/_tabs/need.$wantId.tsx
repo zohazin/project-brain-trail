@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { CalendarClock, Check, ChevronRight, Feather, MapPin, MapPinned, SendHorizontal, Sparkles } from "lucide-react";
 import { ShayariPanel } from "@/components/app/Shayari";
@@ -12,14 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DistancePicker } from "@/components/app/DistancePicker";
 import { AiNotice, Card, ItemThumb, Pill, Stars, requestStatusWords, statusTone } from "@/components/app/bits";
-import { applyQuantityChange, cancelBooking, cleanNote, planForWant, talkNeed } from "@/lib/app.functions";
+import { applyQuantityChange, autoAcceptSimulated, cancelBooking, cleanNote, planForWant, talkNeed } from "@/lib/app.functions";
 import { errMessage, profileQuery, wantQuery } from "@/lib/queries";
 import { coverageLine, fmtDateTime, fmtDistance, fmtQty, money, priceLabel } from "@/lib/format";
 import { QuoteBox, type QuoteRow } from "@/components/app/Quote";
 import type { Plan, PlanLine } from "@/lib/plan-types";
 import type { ChangePreview } from "@/lib/change";
 import { ensureOnline, useDraft } from "@/hooks/use-app";
-import { AiDemoLabel, DemoIntro, DemoMaker, DemoPlanBanner, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel } from "@/components/app/DemoResults";
+import { AiDemoLabel, DemoIntro, DemoMaker, DemoPlanBanner, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel, TrialBadge } from "@/components/app/DemoResults";
+import { TryTrialButton } from "@/components/app/Trial";
 import { demoMatches } from "@/lib/app.functions";
 
 type Want = Database["public"]["Tables"]["wants"]["Row"];
@@ -453,6 +454,15 @@ function PlanSection({ want, missing }: { want: Want; missing: number }) {
                   <p className="text-sm text-muted-foreground">Or choose any distance above.</p>
                 </div>
               )}
+              {profile && !profile.is_demo && (
+                <div className="mt-4 rounded-xl border border-dashed border-attention bg-card p-3">
+                  <p className="font-semibold">Want to see how a full booking works?</p>
+                  <p className="text-sm text-muted-foreground">
+                    Trial mode opens a separate practice account with fictional items and AI lenders. Your real listings and bookings are not used or changed.
+                  </p>
+                  <TryTrialButton className="mt-2" />
+                </div>
+              )}
             </Card>
           )}
 
@@ -738,7 +748,33 @@ function Backup({ want, plan }: { want: Want; plan: Plan }) {
 function Requests({ want, requests, missing }: { want: Want; requests: Req[]; missing: number }) {
   const qc = useQueryClient();
   const cancel = useServerFn(cancelBooking);
+  const autoAccept = useServerFn(autoAcceptSimulated);
+  const { data: profile } = useQuery(profileQuery(want.borrower_id));
   const live = requests.filter((r) => r.status !== "cancelled");
+  // Trial setting on: simulated lenders say yes through the normal answer, a moment after the borrower approved sending.
+  const autoOn = Boolean(profile?.is_demo && profile.sim_auto);
+  const waitingSim = live.filter((r) => r.simulated && r.status === "requested").map((r) => r.id).sort().join(",");
+  const asked = useRef("");
+  const [simBusy, setSimBusy] = useState(false);
+  useEffect(() => {
+    if (!autoOn || !waitingSim || asked.current === waitingSim) return;
+    asked.current = waitingSim;
+    setSimBusy(true);
+    const t = setTimeout(async () => {
+      try {
+        const out = await autoAccept({ data: { wantId: want.id } });
+        if (out.accepted.length) toast.success(out.accepted.length === 1 ? "The AI demo lender said yes. Open chat to talk." : `${out.accepted.length} AI demo lenders said yes. Open chat to talk.`);
+        if (out.unavailable) toast.message("One item was booked by someone else first. A replacement search is ready.");
+      } catch (e) {
+        toast.error(errMessage(e));
+      } finally {
+        setSimBusy(false);
+        await qc.invalidateQueries({ queryKey: ["want", want.id] });
+        await qc.invalidateQueries({ queryKey: ["activity"] });
+      }
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [autoOn, waitingSim, want.id, autoAccept, qc]);
   const confirmed = live.filter((r) => r.status === "confirmed" || r.status === "completed");
   const confirmedQty = confirmed.reduce((s, r) => s + Number(r.quantity), 0);
   const requestedQty = live.filter((r) => r.status === "requested").reduce((s, r) => s + Number(r.quantity), 0);
@@ -787,7 +823,7 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
                 {r.simulated && (
                   <div className="mt-1 flex flex-wrap gap-1">
                     <SimulatedOwnerLabel />
-                    <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Demo item</span>
+                    <TrialBadge />
                   </div>
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -802,12 +838,17 @@ function Requests({ want, requests, missing }: { want: Want; requests: Req[]; mi
               </div>
               {(r.status === "confirmed" || r.status === "completed") && (
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/inbox/$requestId" params={{ requestId: r.id }}>
-                    Open <ChevronRight />
+                  <Link to="/inbox/$requestId" params={{ requestId: r.id }} {...(r.simulated ? { hash: "chat" } : {})}>
+                    {r.simulated ? "Open chat" : "Open"} <ChevronRight />
                   </Link>
                 </Button>
               )}
-              {r.simulated && r.status === "requested" && (
+              {r.simulated && r.status === "requested" && autoOn && simBusy && (
+                <p className="basis-full text-sm text-muted-foreground" aria-live="polite">
+                  The AI demo lender is answering…
+                </p>
+              )}
+              {r.simulated && r.status === "requested" && !(autoOn && simBusy) && (
                 <div className="basis-full">
                   <SimOwnerActions r={r} />
                 </div>

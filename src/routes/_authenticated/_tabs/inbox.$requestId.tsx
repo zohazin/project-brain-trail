@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { ShayariPanel, ShayariView } from "@/components/app/Shayari";
 import { bookingDone, isShayariSnapshot, thanksStarter, type ShayariSnapshot } from "@/lib/shayari";
 import { AiDemoLabel, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel } from "@/components/app/DemoResults";
+import { LenderStatus, useDemoLender } from "@/components/app/Trial";
 
 type Req = Database["public"]["Tables"]["requests"]["Row"];
 type Bundle = RequestBundle;
@@ -773,7 +774,7 @@ function DateChange({ r, userId, otherName }: { r: Req; userId: string; otherNam
   const oldBack = pending?.old_return_at ?? r.return_at;
 
   return (
-    <Card className="space-y-2">
+    <Card id="change" className="space-y-2">
       <h2 className="flex items-center gap-2 text-lg font-bold">
         <CalendarClock className="h-5 w-5" aria-hidden /> Change this booking
       </h2>
@@ -1127,6 +1128,16 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
   const lastId = data.messages[data.messages.length - 1]?.id;
+  const me = useQuery(profileQuery(userId));
+  const iAmBorrower = r.borrower_id === userId;
+  // Trial mode: the simulated lender answers in this same chat (server-side AI, one reply per message).
+  const lender = useDemoLender({
+    requestId: r.id,
+    enabled: Boolean(iAmBorrower && r.simulated && me.data?.is_demo && me.data.sim_auto && !closed),
+    messages: data.messages,
+    borrowerId: r.borrower_id,
+    lastId,
+  });
 
   // Anything left "sending" from an earlier visit is shown as not sent; when the connection is back, retry once each.
   useEffect(() => {
@@ -1194,6 +1205,8 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
       }
       await qc.invalidateQueries({ queryKey: ["request", r.id] });
       setOutgoing((list) => list.filter((x) => x.clientId !== o.clientId));
+      // Saved first, then the demo lender is asked for its reply (only for this message, only once).
+      void lender.ask(o.clientId);
     } finally {
       busyIds.current.delete(o.clientId);
     }
@@ -1214,22 +1227,28 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
     queue({ body });
   }
 
-  const me = useQuery(profileQuery(userId));
-  const iAmBorrower = r.borrower_id === userId;
   const sentThanks = data.messages.some((m) => m.kind === "thanks" && m.sender_id === userId) || pending.some((o) => o.kind === "thanks");
 
   return (
-    <Card>
+    <Card id="chat">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-lg font-bold">Chat with {otherName}</h2>
         <a href="#summary" className="text-sm font-semibold text-primary underline">
           Booking summary
         </a>
       </div>
-      <p className="text-sm text-muted-foreground">Only the two of you can see this.</p>
+      {r.simulated && iAmBorrower ? (
+        <p className="text-sm text-muted-foreground">
+          <SimulatedOwnerLabel /> {me.data?.sim_auto ? `${otherName} replies with AI and only knows this listing and booking. Nothing in chat changes the booking.` : "Simulated replies are off in your profile."}
+        </p>
+      ) : (
+        <p className="text-sm text-muted-foreground">Only the two of you can see this.</p>
+      )}
       <ol ref={listRef} className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto" aria-live="polite">
-        {data.messages.map((m) => (
-          <li key={m.id} className={m.sender_id === null ? "text-center" : m.sender_id === userId ? "flex justify-end" : "flex"}>
+        {data.messages.map((m) => {
+          const ls = lender.statusFor(m);
+          return (
+          <li key={m.id} className={cn(m.sender_id === null ? "text-center" : m.sender_id === userId ? "flex justify-end" : "flex", ls && "flex-col items-end")}>
             {m.sender_id === null ? (
               <span className="inline-block rounded-2xl bg-muted px-3 py-1 text-sm text-muted-foreground">
                 {m.body} <span className="opacity-70">· {fmtShort(m.created_at)}</span>
@@ -1251,8 +1270,15 @@ function Chat({ data, userId, otherName, closed }: { data: Bundle; userId: strin
                 </span>
               </span>
             )}
+            {ls && <LenderStatus s={ls} name={otherName} />}
+            {lender.wantsChange.has(m.id) && r.status === "confirmed" && (
+              <a href="#change" className="mt-1 block text-xs font-semibold text-primary underline">
+                Change amount or dates
+              </a>
+            )}
           </li>
-        ))}
+          );
+        })}
         {pending.map((o) => (
           <li key={o.clientId} className="flex flex-col items-end">
             {o.kind ? (

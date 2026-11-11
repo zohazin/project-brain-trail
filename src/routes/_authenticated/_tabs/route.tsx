@@ -5,6 +5,7 @@ import { Logo } from "@/components/app/Logo";
 import { NotificationBell, OfflineBanner } from "@/components/app/AppBars";
 import { activityQuery, profileQuery, rolesQuery, unreadQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { TrialBanner } from "@/components/app/Trial";
 
 export const Route = createFileRoute("/_authenticated/_tabs")({
   beforeLoad: async ({ context }) => {
@@ -50,11 +51,6 @@ function TabsLayout() {
         <Link to="/find" className="px-2 py-2">
           <Logo />
         </Link>
-        {me?.is_demo && (
-          <p className="mx-2 mt-2 rounded-lg bg-attention-soft px-2 py-1 text-xs font-semibold text-attention-foreground">
-            Demo account — made-up people and items only
-          </p>
-        )}
         <nav className="mt-6 flex flex-1 flex-col gap-1" aria-label="Main">
           {TABS.map((t) => (
             <Link
@@ -90,6 +86,7 @@ function TabsLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <OfflineBanner />
+        {me?.is_demo && <TrialBanner />}
         {/* Mobile header */}
         <header className="sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur md:hidden">
           <Link to="/find" className="flex min-w-0 items-center gap-2">
@@ -148,7 +145,7 @@ function TabsLayout() {
 }
 
 function DemoTag() {
-  return <span className="rounded-md bg-attention-soft px-1.5 py-0.5 text-xs font-bold text-attention-foreground">Demo</span>;
+  return <span className="rounded-md bg-attention-soft px-1.5 py-0.5 text-xs font-bold text-attention-foreground">Trial</span>;
 }
 
 function Badge({ n }: { n: number }) {

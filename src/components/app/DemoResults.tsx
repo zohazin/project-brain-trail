@@ -13,6 +13,7 @@ import { errMessage } from "@/lib/queries";
 import { fmtShort } from "@/lib/format";
 import { ensureOnline } from "@/hooks/use-app";
 import type { Plan } from "@/lib/plan-types";
+import { LENDER_LABEL, TRIAL_BADGE } from "@/lib/demo-chat";
 
 export const SAMPLE_PHOTO_TEXT = "Sample photo unavailable";
 export const FAIL_TEXT = "Couldn't create sample matches. Your request is saved.";
@@ -23,13 +24,22 @@ export function AiDemoLabel({ className }: { className?: string }) {
       <span className="inline-flex items-center gap-1 rounded-full bg-attention px-2 py-0.5 text-xs font-semibold text-foreground">
         <Bot className="h-3.5 w-3.5" aria-hidden /> AI demo results — fictional
       </span>
-      <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">Demo item</span>
+      <span className="rounded-full border border-attention px-2 py-0.5 text-xs font-semibold">{TRIAL_BADGE}</span>
     </span>
   );
 }
 
 export function SimulatedOwnerLabel() {
-  return <span className="rounded-full border border-attention bg-attention-soft px-2 py-0.5 text-xs font-semibold text-attention-foreground">Simulated owner</span>;
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-attention bg-attention-soft px-2 py-0.5 text-xs font-semibold text-attention-foreground">
+      <Bot className="h-3 w-3" aria-hidden /> {LENDER_LABEL}
+    </span>
+  );
+}
+
+/** Small badge beside a fictional listing's title. */
+export function TrialBadge() {
+  return <span className="rounded-full border border-attention bg-attention-soft px-2 py-0.5 text-xs font-semibold text-attention-foreground">{TRIAL_BADGE}</span>;
 }
 
 const INTRO_KEY = "cu-ai-demo-intro";
@@ -51,7 +61,7 @@ export function DemoIntro() {
         <Sparkles className="h-5 w-5" aria-hidden /> AI demo results
       </p>
       <p className="text-sm">If a match is missing, AI can create sample items so you can try the full app.</p>
-      <p className="text-sm text-muted-foreground">They are fictional, marked “Demo item”, and only demo accounts see them. You answer for their owners with the demo buttons.</p>
+      <p className="text-sm text-muted-foreground">They are fictional, marked “Trial data”, and only trial and demo accounts see them. Their lenders are simulated: they can say yes and reply in chat with AI, or you answer for them with the demo buttons.</p>
       <Button
         size="sm"
         variant="outline"

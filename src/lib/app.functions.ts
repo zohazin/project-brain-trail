@@ -400,7 +400,7 @@ export const demoMatches = createServerFn({ method: "POST" })
     return out;
   });
 
-export const UNAVAILABLE = "Someone else booked this item for these times first, so it isn't available. Nothing was booked for you; a replacement search is ready.";
+export { UNAVAILABLE } from "./demo-chat";
 
 /** Presenter controls for a simulated demo owner. They run the normal booking rules as that owner. */
 export const simOwnerAction = createServerFn({ method: "POST" })
@@ -415,31 +415,40 @@ export const simOwnerAction = createServerFn({ method: "POST" })
     if (before.error || !before.data || before.data.borrower_id !== context.userId || !before.data.simulated) {
       throw new Error("Demo actions work only with simulated demo owners.");
     }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const r = await supabaseAdmin.rpc("sim_owner_act", { _req: data.requestId, _presenter: context.userId, _action: data.action });
-    if (r.error && data.action === "accept" && /enough free/i.test(r.error.message)) {
-      // Lost a race: another borrower's booking took the stock first. The owner can't lend, so the normal decline runs
-      // and a replacement for only this amount is offered. The other booking is untouched.
-      const d = await supabaseAdmin.rpc("sim_owner_act", { _req: data.requestId, _presenter: context.userId, _action: "decline" });
-      if (!d.error) {
-        const { prepareBackup } = await import("./plan.server");
-        const b = before.data;
-        await prepareBackup(b.want_id, `${b.owner_name || "An owner"}'s ${b.item_name.toLowerCase()} was booked by someone else for these times.`);
-      }
-      return { ok: false as const, status: "unavailable", message: UNAVAILABLE };
-    }
-    if (r.error) throw new Error(r.error.message);
-    const status = String((r.data as { status?: string } | null)?.status ?? "");
-    if (data.action === "accept" && status === "expired") {
-      throw new Error("This request expired because the pickup time has passed. Nothing was booked.");
-    }
-    if (data.action === "decline" && before.data.status === "requested") {
-      const { prepareBackup } = await import("./plan.server");
-      const b = before.data;
-      const unit = b.unit === "item" ? b.item_name.toLowerCase() : `${b.unit} of ${b.item_name.toLowerCase()}`;
-      await prepareBackup(b.want_id, `${b.owner_name || "An owner"} can't lend ${Number(b.quantity)} ${unit}.`);
-    }
-    return { ok: true as const, status, message: null };
+    const { runSimAction } = await import("./demo-chat.server");
+    return runSimAction(before.data, context.userId, data.action);
+  });
+
+// ---------------- Trial mode: simulated lender decisions and AI lender replies ----------------
+/** After the borrower approved sending: simulated lenders say yes (when the trial setting is on). Repeat-safe. */
+export const autoAcceptSimulated = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ wantId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const w = await context.supabase.from("wants").select("id, borrower_id").eq("id", data.wantId).single();
+    if (w.error || !w.data || w.data.borrower_id !== context.userId) throw new Error("Not found");
+    const { autoAcceptForWant } = await import("./demo-chat.server");
+    return autoAcceptForWant(context.userId, data.wantId);
+  });
+
+/** The AI demo lender's reply to one saved message of the borrower (at most one reply per message). */
+export const demoLenderReply = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ requestId: z.string().uuid(), clientId: z.string().uuid(), retry: z.boolean().optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    // The person must be able to see this booking (row security) before anything runs with server rights.
+    const r = await context.supabase.from("requests").select("id").eq("id", data.requestId).maybeSingle();
+    if (r.error || !r.data) throw new Error("Not found");
+    const { lenderReply } = await import("./demo-chat.server");
+    return lenderReply(context.userId, data.requestId, data.clientId, Boolean(data.retry));
+  });
+
+/** A real member opens a private trial account (fictional items and AI lenders only). Returns one-time sign-in details. */
+export const startTrial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { startTrialAccount } = await import("./demo-chat.server");
+    return startTrialAccount(context.userId);
   });
 
 // Owner answers an exception (distance) first; this is separate from saying yes to the booking.

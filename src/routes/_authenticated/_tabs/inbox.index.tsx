@@ -4,6 +4,7 @@ import { ChevronRight, MessageCircle } from "lucide-react";
 import { Card, Empty, PageTitle, Pill, statusTone } from "@/components/app/bits";
 import { activityQuery, unreadQuery } from "@/lib/queries";
 import { fmtQty, fmtShort } from "@/lib/format";
+import { SimulatedOwnerLabel } from "@/components/app/DemoResults";
 
 export const Route = createFileRoute("/_authenticated/_tabs/inbox/")({
   head: () => ({
@@ -36,13 +37,18 @@ function Inbox() {
           const other = iAmOwner ? (r.borrower_name ?? "Borrower") : r.owner_name;
           return (
             <li key={r.id}>
-              <Link to="/inbox/$requestId" params={{ requestId: r.id }} className="block">
+              <Link to="/inbox/$requestId" params={{ requestId: r.id }} {...(r.simulated && !iAmOwner ? { hash: "chat" } : {})} className="block">
                 <Card className="flex items-center gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-lg font-bold text-secondary-foreground">
                     {other.charAt(0)}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold">{other}</p>
+                    {r.simulated && !iAmOwner && (
+                      <p className="mt-0.5">
+                        <SimulatedOwnerLabel />
+                      </p>
+                    )}
                     <p className="truncate text-sm text-muted-foreground">
                       {iAmOwner ? "Lending" : "Borrowing"} {fmtQty(Number(r.quantity), r.unit)} {r.item_name.toLowerCase()} · {fmtShort(r.pickup_at)}
                     </p>

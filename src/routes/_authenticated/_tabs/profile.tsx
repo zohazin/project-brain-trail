@@ -14,6 +14,7 @@ import { LocationPicker, type PickedPlace } from "@/components/app/LocationPicke
 import { DistancePicker } from "@/components/app/DistancePicker";
 import { InstallSection } from "@/components/app/InstallApp";
 import { DemoGuide, ShayariDemoSetup } from "@/components/app/DemoAccounts";
+import { LeaveTrial, TryTrialButton } from "@/components/app/Trial";
 import { blocksQuery, impactQuery, profileQuery } from "@/lib/queries";
 import { ownPhotoUrl, uploadPhoto } from "@/lib/upload";
 
@@ -166,11 +167,30 @@ function Profile() {
         <InstallSection />
       </Card>
       <Impact demo={p.is_demo} />
-      {p.is_demo && (
+      {!p.is_demo && (
+        <Card className="space-y-2">
+          <h2 className="text-lg font-bold">Trial mode</h2>
+          <p className="text-sm text-muted-foreground">
+            Try a full booking with fictional items and AI lenders in a separate practice account. Your real listings, requests and chats are not used or changed. Leave the trial any time from the banner at the top.
+          </p>
+          <TryTrialButton variant="outline" />
+        </Card>
+      )}
+      {p.is_demo && p.trial_of && (
+        <Card tone="attention" className="space-y-2">
+          <p className="font-semibold">Trial mode</p>
+          <p className="text-sm">This practice account only sees fictional items and AI demo lenders. Nothing here reaches real members.</p>
+          <AiDemoSwitch userId={p.id} on={p.ai_demo_results} />
+          <SimAutoSwitch userId={p.id} on={p.sim_auto} />
+          <LeaveTrial />
+        </Card>
+      )}
+      {p.is_demo && !p.trial_of && (
         <Card tone="attention" className="space-y-2">
           <p className="font-semibold">Demo account</p>
           <p className="text-sm">Demo accounts only see demo people and demo items. Real members never see them.</p>
           <AiDemoSwitch userId={p.id} on={p.ai_demo_results} />
+          <SimAutoSwitch userId={p.id} on={p.sim_auto} />
           <DemoGuide />
           <p className="text-sm">
             Reset removes the old demo requests, chats and reminders, puts the chairs, glue and paint back, and leaves every real member's records alone.
@@ -272,7 +292,38 @@ function AiDemoSwitch({ userId, on }: { userId: string; on: boolean }) {
       <label htmlFor="ai-demo-results" className="text-sm">
         <span className="font-semibold">AI demo results</span>
         <br />
-        If a match is missing, AI can create sample items so you can try the full app. They are fictional, marked “Demo item”, and only demo accounts see them.
+        If a match is missing, AI can create sample items so you can try the full app. They are fictional, marked “Trial data”, and only trial and demo accounts see them.
+      </label>
+    </div>
+  );
+}
+
+/** Trial setting: simulated lenders say yes and reply in chat by themselves. Off = you answer for them with the demo buttons. */
+function SimAutoSwitch({ userId, on }: { userId: string; on: boolean }) {
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-card p-3">
+      <Switch
+        id="sim-auto"
+        checked={on}
+        disabled={busy}
+        onCheckedChange={async (v) => {
+          setBusy(true);
+          const { error } = await supabase.from("profiles").update({ sim_auto: v, updated_at: new Date().toISOString() }).eq("id", userId);
+          setBusy(false);
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
+          toast.success(v ? "Simulated lenders now answer by themselves." : "Simulated lenders now wait for your demo buttons.");
+          await qc.invalidateQueries({ queryKey: ["profile", userId] });
+        }}
+      />
+      <label htmlFor="sim-auto" className="text-sm">
+        <span className="font-semibold">Simulate lender acceptance and replies</span>
+        <br />
+        On: AI demo lenders say yes through the normal booking checks and reply in chat. Off: you answer for them with the demo buttons.
       </label>
     </div>
   );

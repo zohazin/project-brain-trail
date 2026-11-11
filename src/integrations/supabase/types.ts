@@ -218,6 +218,67 @@ export type Database = {
           },
         ]
       }
+      demo_replies: {
+        Row: {
+          attempts: number
+          borrower_id: string
+          created_at: string
+          error: string | null
+          message_id: string
+          reply_id: string | null
+          request_id: string
+          status: string
+          updated_at: string
+          wants_change: boolean
+        }
+        Insert: {
+          attempts?: number
+          borrower_id: string
+          created_at?: string
+          error?: string | null
+          message_id: string
+          reply_id?: string | null
+          request_id: string
+          status?: string
+          updated_at?: string
+          wants_change?: boolean
+        }
+        Update: {
+          attempts?: number
+          borrower_id?: string
+          created_at?: string
+          error?: string | null
+          message_id?: string
+          reply_id?: string | null
+          request_id?: string
+          status?: string
+          updated_at?: string
+          wants_change?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_replies_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: true
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demo_replies_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demo_replies_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       items: {
         Row: {
           accessories: string
@@ -534,8 +595,10 @@ export type Database = {
           restricted: boolean
           shayari_language: string
           shayari_tone: string
+          sim_auto: boolean
           test_cnic: string | null
           travel_km: number
+          trial_of: string | null
           updated_at: string
         }
         Insert: {
@@ -555,8 +618,10 @@ export type Database = {
           restricted?: boolean
           shayari_language?: string
           shayari_tone?: string
+          sim_auto?: boolean
           test_cnic?: string | null
           travel_km?: number
+          trial_of?: string | null
           updated_at?: string
         }
         Update: {
@@ -576,8 +641,10 @@ export type Database = {
           restricted?: boolean
           shayari_language?: string
           shayari_tone?: string
+          sim_auto?: boolean
           test_cnic?: string | null
           travel_km?: number
+          trial_of?: string | null
           updated_at?: string
         }
         Relationships: []
