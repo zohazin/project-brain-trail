@@ -53,13 +53,13 @@ Submission documents: [`docs/MVP.md`](docs/MVP.md) (MVP document) and [`docs/SUB
 
 ## Links
 
-- **Live app:** https://project-brain-trail.lovable.app
+- **Live app:** https://lasting-project-notes.lovable.app
 - **GitHub:** https://github.com/zohazin/project-brain-trail (branch `main`; Lovable keeps it in sync automatically)
 - **MVP document:** [`docs/MVP.md`](docs/MVP.md) · **Submission answers:** [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 
 ## Published app
 
-https://project-brain-trail.lovable.app — installable from the browser (Install app on Profile; iPhone: Share → Add to Home Screen). Reminders and request expiry run every hour in the background.
+https://lasting-project-notes.lovable.app — installable from the browser (Install app on Profile; iPhone: Share → Add to Home Screen). Reminders and request expiry run every hour in the background.
 
 ## What this MVP does
 
@@ -108,7 +108,7 @@ Before: Profile → **Reset demo data** on Ali. Phone A = Ali, Phone B = owner a
 
 ## Physical-phone checklist (not yet done on a real phone)
 
-1. Open https://project-brain-trail.lovable.app on Android Chrome → Profile → **Install app**; on iPhone Safari → Share → **Add to Home Screen**. Open from the home screen: no browser bar.
+1. Open https://lasting-project-notes.lovable.app on Android Chrome → Profile → **Install app**; on iPhone Safari → Share → **Add to Home Screen**. Open from the home screen: no browser bar.
 2. Sign in, turn on airplane mode, reopen the app: the offline note shows and typed text is kept; turn it off: the message sends once.
 3. During sign-up or when adding a listing → **Use my location**: allow GPS, check the area chosen is right.
 4. Make a rhyme in **Urdu**: letters are joined, right-to-left, nothing cut off; the keyboard doesn't cover the Send button.

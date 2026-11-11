@@ -310,3 +310,6 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 - No database change is needed here. Not pushed (they belong to the copy only): its `.env`, `supabase/config.toml` and its extra table-note migration 0017.
 - Checked in the copy: 138 automatic tests pass; browser checks of Find, search, item page, AI demo listings, uploaded-photo priority and image fallback. This repository's copy was typechecked and tested before pushing. **Not checked:** this project's own preview/live site after the push — open it in Lovable and publish to update project-brain-trail.lovable.app.
 
+## Update 2026-11-11 (README links)
+- README live-app links (3 places: Links section, Live app line, physical-phone checklist) now point to https://lasting-project-notes.lovable.app (the Cheez Udhaar copy project, live with the trial photos), as chosen by the user. GitHub link and docs links unchanged.
+- project-brain-trail.lovable.app itself was not changed.
