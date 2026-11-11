@@ -109,3 +109,5 @@
 - [x] K. Three-minute demo script + Q&A + phone checklist (README)
 - [x] L. Published 11 Nov 2026; live check: page loads (200), install file standalone, demo sign-in → Find works at 320 px with no sideways scroll, AI demo switch/reset/Shayari demo present, new listing-hours and header fixes in live files
 - [x] M. Final handoff given. Next action: connect GitHub (owner), run the real-phone checklist in README
+
+- [ ] Connect GitHub sync and confirm a commit arrives — blocked: owner must connect in Project settings → Git
