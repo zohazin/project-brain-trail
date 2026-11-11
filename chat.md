@@ -115,7 +115,7 @@ Goal: make the app reliable for new users and different items. Both uploads carr
 - Ali shared a photo, Sara skipped → Sara sees Ali's, Ali doesn't see Sara's; Hina sees neither. PASS
 - Unrelated Bilal: no access to their requests, chat, addresses, photo choices, meeting times, photos, names; can't post in their chat. PASS
 - Meeting overlap suggestion / "choose another time"; report → reply → Multan admin decision → appeal → closed; non-admin can't decide. PASS
-- Demo data reset afterwards. Test account cheez57rmvzh3@fldubai.com ("Nadia Test") remains from the email test.
+- Demo data reset afterwards. Test account (throwaway inbox, "Nadia Test") remains from the email test.
 
 ### Still open / needs the owner
 - Typed code in emails: needs an email domain (owner's choice/plan).

@@ -19,7 +19,7 @@ Configuration lives in `.env` (see `.env.example`). Only public browser keys are
 
 ## Demo (two devices)
 
-Demo accounts are fictional and only ever see each other (real members never see them). Password for all: `CheezDemo2026`.
+Judges need no personal account: sign in with any demo account below. Demo accounts are fictional and only ever see each other (real members never see them, and demo accounts cannot reach real members' data). Password for all: `CheezDemo2026` — public on purpose, for demo accounts only.
 
 | Account | Email | Role |
 |---|---|---|
@@ -49,7 +49,13 @@ When the demo neighbours don't have enough, demo accounts get **fictional** owne
 4. Booking: **I collected these items** → **Confirm pickup as owner**; return fewer → **Confirm return as owner** ("1 still due"); **Owner shares a meeting time**; chat and Make it rhyme work as usual.
 5. Profile → **AI demo results** switch turns it off. **Reset demo data** removes every fictional owner, listing and booking.
 
-Submission document: [`docs/MVP.md`](docs/MVP.md).
+Submission documents: [`docs/MVP.md`](docs/MVP.md) (MVP document) and [`docs/SUBMISSION.md`](docs/SUBMISSION.md) (form answers).
+
+## Links
+
+- **Live app:** https://project-brain-trail.lovable.app
+- **GitHub:** https://github.com/zohazin/project-brain-trail (branch `main`; Lovable keeps it in sync automatically)
+- **MVP document:** [`docs/MVP.md`](docs/MVP.md) · **Submission answers:** [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 
 ## Published app
 

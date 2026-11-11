@@ -1,103 +1,132 @@
-# Cheez Udhaar — MVP submission
+# Cheez Udhaar — MVP document (TECHSoc Hackathon 2026)
 
-*No official example MVP document was available in the project, so this uses a plain practical structure.*
+- **Published app:** https://project-brain-trail.lovable.app
+- **GitHub repository:** https://github.com/zohazin/project-brain-trail (branch `main`; not publicly visible, so reviewers need collaborator access)
+- **Submission answers:** [`docs/SUBMISSION.md`](SUBMISSION.md)
+- **Status date:** 11 November 2026 (Asia/Karachi)
 
-**Published app:** https://project-brain-trail.lovable.app
-**GitHub:** not connected yet (the code is saved in Lovable's own code storage; connecting GitHub needs the project owner — see "Known limitations").
-**Status date:** 11 November 2026 (Asia/Karachi)
+*No official example MVP document was provided, so this uses a plain practical structure.*
 
-## 1. Purpose
+## 1. Community problem and intended users
 
-Cheez Udhaar ("borrow a thing") lets neighbours in one community — starting with **Multan** — borrow and lend everyday things: folding chairs for a family event, a projector, a drill, a tent, glue by the gram. One account can borrow and lend. People write in **English or Roman Urdu**; rhymes can also be made in Urdu script.
+When a family in Multan needs 20 chairs for one evening, a drill for an hour or glue for one school project, they buy something they will use once, rent at a high price, or phone around. The same things sit unused in nearby homes, but nobody knows who has them, and asking strangers raises worries about privacy, unclear amounts, late returns and "who agreed to what".
 
-## 2. The community problem
+**Intended users:** neighbours in one community (starting with **Multan**) who want to borrow or lend everyday things. One account can both borrow and lend. People write in **English or Roman Urdu**; rhymes can also be made in Urdu script. An **area admin** handles problem reports for their own area.
 
-When a family needs 20 chairs or a drill for one afternoon, they either buy something they will use once, rent at a high price, or phone around. Things that already sit unused in nearby homes are hard to find, and asking strangers raises worries about privacy, unclear amounts, late returns and "who said yes to what".
+## 2. Borrower and lender workflow
 
-## 3. Benefits
+**Borrower**
+1. **Find** — types a need in their own words, e.g. `Sunday ko 20 kursiyan chahiye, 1 baje le jaunga, shaam 6 baje wapas` (a photo can be added).
+2. **One useful question** — if something critical is missing (return time, full-size or mini glue gun, drill-bit size), the AI asks one question.
+3. **Plan** — sees exact pickup and return dates (Karachi time), one combined plan across owners (e.g. Owner A 12 + Owner B 8), pickup areas, distances and the exact total. Owners appear as "Owner A/B" until they say yes; listings that don't fit say why (e.g. "needs them back by 4 PM").
+4. **Send** — one tap sends all requests; the agreed details and price are saved at that moment.
+5. **Replacement** — if an owner says no, the app offers a replacement for only the missing amount, which the borrower approves before anything is sent.
+6. **Booking** — chat, a meeting time and place, an optional exact address and photo (each person decides for themselves), pickup and return reports, partial returns ("11 of 12 returned — 1 still due"), change requests, ratings, and Report a problem.
 
-**Borrowers:** one message describes the need; the app finds enough items across several neighbours, shows exact dates, distance and the total price, and replaces an owner who says no. Their name and photo stay hidden until an owner says yes.
+**Lender**
+1. **My Items → Add** — photos, description, amount, condition, accessories, available days and hours, how far a borrower can be, whether faraway requests are allowed, and a price (free, per booking, per day, or per amount for things that are used up, e.g. Rs 15 per 5 ml).
+2. **Activity** — sees an anonymous request with the exact amount, dates and total; answers **Yes, lend it** or **No, sorry** (or no and block).
+3. **Handover** — confirms pickup and return amounts. Stock changes only when the owner confirms.
 
-**Lenders:** earn from (or freely share) idle things, set their own hours, distance and price, see exactly what was agreed, and confirm pickups and returns themselves; stock only changes when the owner confirms.
+## 3. What the AI actually does at runtime
 
-## 4. Main workflow
+All AI calls run on the server through Lovable AI (model `openai/gpt-6-astra`, `src/lib/ai.server.ts`). The AI:
 
-1. **Find** — the borrower types a need, e.g. `Sunday ko 20 kursiyan chahiye, 1 baje le jaunga, shaam 6 baje wapas`.
-2. **One useful question** — if a must-have detail is unclear (full-size or mini glue gun? drill bit size?), the AI asks once.
-3. **Plan** — the app combines owners (e.g. 12 + 8), shows exact Karachi-time dates, distance and the total. Owners appear as "Owner A/B".
-4. **Send** — one tap sends all requests; the agreed details are saved at that moment.
-5. **Owner answers** — yes reveals first names and opens chat; no brings a replacement for only the missing amount, which the borrower approves.
-6. **Meet, pick up, return** — each side shares a time and place; the borrower reports pickup/return, the owner confirms; partial returns show "1 still due".
-7. **Rate / report** — both rate; problems go to an area admin.
-
-## 5. What the runtime AI actually does
-
-All AI calls run on the server (`src/lib/ai.server.ts`) through Lovable AI. The AI:
-
-- reads a free-text request into item, amount, dates, budget, distance and must-have features, and asks one follow-up question when something critical is missing;
-- judges whether a listing is the **right kind of item** and whether a must-have feature is missing, using the listing's own description;
-- cleans faraway-request notes of names and addresses (delete-only, then fixed rules check again);
-- writes Shayari (two rhyming lines + plain meaning) and checks that the meaning was kept;
+- reads a free-text request (English or Roman Urdu, optional photo) into item, amount, dates, budget, distance and must-have features, and asks one follow-up question when something critical is missing;
+- writes a private summary of each listing and each request, and judges whether a listing is the **right kind of item** and whether a must-have feature is missing, using the listing's own description and specs;
+- cleans faraway-request notes of names, phone numbers and addresses (it may only hide or delete words, and fixed rules check again afterwards);
+- writes Shayari (two rhyming lines plus a plain meaning), and a second reading checks the meaning was kept;
 - for **demo accounts only**, writes fictional listings when the demo neighbours don't have enough.
 
-The AI **never** decides stock, availability, times, distance, price or who gets an item — the database does (`match_items`, `price_for`, `send_requests`, `respond_request`). If the AI is unavailable the person sees a clear message and a retry, and no reply is ever invented.
+The AI **never** decides stock, availability, times, distance, price or who gets an item. If the AI is unavailable, the person sees a clear message and **Try again**; no reply is ever invented.
 
-## 6. How fictional demo inventory is identified
+## 4. Matching, quantities, availability and booking rules
 
-Seven fictional demo accounts (Ali, Bilal, Sara, Usman, Hina, Farah, Zainab) and 10 seeded items exist for testing. When a demo search needs more than they have, AI creates fictional owners and listings **only for the shortfall**. Every one is labelled on screen: **"AI demo results — fictional"**, **"Demo item"**, **"Simulated owner"**, **"Sample photo unavailable"** (no fake photos). Their owners' answers are given by the presenter with **Simulate owner accepting / declining** buttons, which run the same booking rules as a real owner. Demo and real members never see each other; **Reset demo data** removes all of it and never touches real members.
+- **Matching:** the database (`match_items`) finds candidates and checks real free stock at the requested times, the owner's days and hours, both people's distance limits (straight line) and the budget. The AI only filters "right kind of item / must-have missing".
+- **Quantities:** a plan can combine several owners; each line is checked against stock already promised to other bookings for overlapping times. Amounts can be decimals for things that are used up (ml, grams).
+- **Price:** computed by the database (`price_for`) and shown before sending; a request whose total differs is refused.
+- **Booking changes:** every yes, no, cancel, pickup, return, rating, report and admin decision is one locked database step that checks who is calling. Two people racing for the last item → exactly one wins; the other gets a clear message and a replacement.
+- **Changing an agreed booking** (dates or amount) needs the other person's yes; old vs new is shown first.
+- **Handover:** the borrower reports, only the owner confirms; impossible numbers (more than agreed, more back than collected) are refused and every step is kept in a history.
+- **Privacy:** owners show as "Owner A/B" and borrowers stay unnamed until a yes; photos are private and shown only through links that expire after one hour; exact addresses are shared only by choice, per booking.
+- **Background:** an hourly job sends reminders and expires requests whose pickup time has passed, even when the app is closed.
 
-## 7. Card 2 — Shayari Mode
+## 5. Fictional demo inventory and simulated owner actions
 
-| Requirement | Where it works |
+- Seven **fictional demo accounts** (Ali, Bilal, Sara, Usman, Hina, Farah, Zainab) and 10 seeded demo items exist for testing. Demo and real members never see each other.
+- When a demo search needs more than the demo neighbours have, AI creates **fictional owners and listings only for the shortfall**. Each one is labelled on screen: **"AI demo results — fictional"**, **"Demo item"**, **"Simulated owner"**, distances marked **"(simulated)"**, and **"Sample photo unavailable"** (no fake photos).
+- **Simulated owner actions:** the presenter taps **Simulate owner accepting / declining**, **Confirm pickup as owner**, **Confirm return as owner** and **Owner shares a meeting time**. These run the same database rules as a real owner, acting as that fictional owner. Nothing happens automatically.
+- Profile → **AI demo results** switch turns this off. **Reset demo data** removes every fictional owner, listing and demo booking and never touches real members.
+
+## 6. Card 2 — Shayari Mode
+
+"Make it rhyme" turns a message into **exactly two rhyming lines** plus a **plain meaning** shown underneath. The person chooses **Urdu, Roman Urdu or English** and **Friendly or Funny**.
+
+- **Message preserved:** items, numbers, times, prices and who is asking must stay the same (checked by rules plus a second AI reading, with one correction). The original message is kept and can be shown with **Show original message**; **Send original** is always offered.
+- **Review first:** nothing is sent until the person checks it and taps **Send**. A reviewed rhyme is sent once, only in the chat it was made for, and never changes a booking or a rating.
+
+| Where | How it works |
 |---|---|
-| 1. "Make it rhyme" in the booking chat: Urdu / Roman Urdu / English, Friendly / Funny, review before sending | Booking chat |
-| 2. Faraway (exception) request: private details removed first, rhyme made from the safe version, owner sees "Anonymous borrower" | Request page / direct request |
-| 3. Thank-you rhyme only after everything is confirmed back; ratings stay separate | Finished booking |
-| 4. One shared generator and one shared display | `makeShayari`, `Shayari.tsx` |
+| Booking chat | "Make it rhyme" appears beside Send once a message is typed |
+| Faraway (exception) request | Names, phone numbers and addresses are removed first; the rhyme is made from the safe version; the owner sees "Anonymous borrower" |
+| Thank-you card | Only after the final return is confirmed by the owner |
+| Shared parts | One generator (`makeShayari`) and one display (`ShayariView`) |
 
-A reviewed rhyme is sent once, only to the chat it was made for, and never changes a booking.
+## 7. Architecture
 
-## 8. Architecture
+- **App:** TanStack Start (React 19, TypeScript, Tailwind CSS v4), an installable web app, hosted on Lovable's edge hosting.
+- **Backend:** Lovable Cloud — Postgres database with row-level security, email sign-in, private photo storage, hourly background job.
+- **Rules in the database:** booking changes are locked database functions; the app can only read bookings.
+- **Server code:** `src/lib/app.functions.ts`, `src/lib/shayari.functions.ts`; plans in `src/lib/plan.server.ts`; demo generation in `src/lib/demo-gen.server.ts`; AI in `src/lib/ai.server.ts`.
+- **Database history:** `drizzle/migrations/0000–0014` (applied in order).
 
-- **App:** TanStack Start (React 19, TypeScript, Tailwind CSS v4), installable web app (PWA), runs on Lovable's edge hosting.
-- **Backend:** Lovable Cloud — Postgres database with row-level security, email sign-in, private photo storage, hourly background job for reminders and expiry.
-- **Rules in the database:** every booking change (send, answer, cancel, pickup, return, change requests, ratings, reports, admin decisions) is a locked database function that checks who is calling. Clients can only read bookings.
-- **Server functions:** `src/lib/app.functions.ts`, `src/lib/shayari.functions.ts`; plans in `src/lib/plan.server.ts`; demo generation in `src/lib/demo-gen.server.ts`.
-- **Database history:** `drizzle/migrations/0000–0014`.
-
-## 9. Setup and deployment
+## 8. Setup and deployment
 
 ```sh
-npm i
-npm run dev   # http://localhost:8080
-npm test      # automatic checks
+bun install        # or: npm i   (lockfile: bun.lock)
+bun run dev        # http://localhost:8080
+bun run test       # 119 automatic checks
 ```
 
-Public browser settings are in `.env` (example: `.env.example`). Server secrets (AI key, database service key) are managed by Lovable Cloud and are not in the repository. Database changes are the numbered files in `drizzle/migrations`, applied in order. Publishing is done from Lovable (Publish).
+Public browser settings go in `.env` (see `.env.example`; only public keys). Server secrets (the AI key, the database service key) are managed by Lovable Cloud and are never stored in the repository. A new backend needs the migrations in `drizzle/migrations` applied in order and a private storage bucket named `photos`. Publishing is done from Lovable (Publish); the live app is https://project-brain-trail.lovable.app.
 
-## 10. Verification results (10–11 Nov 2026)
+## 9. How to demonstrate
 
-**Automatic checks:** 119 passed (pricing, quantity changes, stock limits, privacy cleaning, distance wording, demo generation rules).
+No personal account is needed. All demo accounts use the public demo password **`CheezDemo2026`**; they are fictional, see only each other, and cannot reach real members' data. Sign-in page → **Sign in** → e.g. `ali.demo@cheezudhaar.test`. The sign-in page and Profile also have an in-app **Demo guide**.
 
-**Live AI (real calls):** Roman Urdu requests and follow-up questions; fictional listings for 5 glue guns (3 + 2, free, within 5 km); faraway-note cleaning; Shayari in Urdu (chat, phone size, right-to-left), Roman Urdu (faraway note) and Roman Urdu + English (thank-you).
+Three-minute sequence (one device, using the simulate buttons):
+1. Ali → Find: `Budhwar shaam 5 baje 5 glue guns chahiye, Jumeraat shaam 5 baje wapas, budget zero` → **Find items**.
+2. The AI asks one question (e.g. "Mini glue guns chahiye ya full-size, aur glue sticks bhi saath chahiye?") → answer `Full-size, sticks bhi chahiye`.
+3. Plan: exact dates, Owner A + Owner B (e.g. 3 + 2), Free. Point at **AI demo results — fictional**, **Demo item**, **(simulated)** distances, **Sample photo unavailable**. → **Send 2 requests**.
+4. **Simulate owner accepting** on one, **Simulate owner declining** on the other → a replacement for only the missing amount → approve → accept. *(Owner taps are simulated by the presenter.)*
+5. Open a booking → **I collected these items** → **Confirm pickup as owner** (simulated). Return fewer → **Confirm return as owner** → "… still due". Return the rest → confirmed.
+6. After the final return: **Say thanks** → **Make it rhyme** → pick Urdu / Roman Urdu / English → show the plain meaning → **Send**.
 
-**Browser tests on the running app (passed):**
-- Full 5-glue-gun demo: exact dates, 3 + 2 plan, one decline, approved replacement of 2, pickup of 5, partial return ("Ahmed is still owed 1"), final return, thank-you rhymes, ratings.
-- Normal members (not demo): add a listing with photo, edit, pause/resume; borrower request with an AI bit-size question; accept, chat, meeting, pickup, return, both ratings. Normal members saw no demo data.
-- Editing a search (amount, budget, dates, distance, new must-have) reuses fitting results and creates only what's missing.
-- Two borrowers racing for the last fictional item: exactly one booked; the other got a clear message and a replacement.
-- Network: offline send + reconnect, a lost server reply, a stalled send (stops after 20 s with retry), drafts after reload, alerts missed while offline, a chat closed while a message waited — each gave one copy or a clear reason. Sign-out clears saved typing.
-- Phone layout at 320, 360, 390 px and desktop on 10 screens.
+Before or after: Profile → **Reset demo data**. For the faraway-note example: Profile → **Prepare Shayari demo** (this also resets the demo).
 
-**Simulated, not real:** fictional owners' yes/no/confirm taps (presenter buttons); AI timeout / no-balance / bad-answer / interrupted-save were forced with a demo-only test switch, not real provider outages.
+## 10. Verified testing
 
-**Backend permission checks (passed):** no access to other people's messages or photos; members cannot make themselves admin, change demo flags, create fictional inventory, use presenter actions or reset the demo; the demo area admin cannot see or decide real members' reports; reset during AI creation leaves nothing behind.
+**Run on 11 Nov 2026 (this final pass):**
+- 119 of 119 automatic checks passed (pricing, quantity changes, stock limits, privacy cleaning, distance wording, demo generation rules).
+- Live smoke test of the published app in a fresh browser (desktop size): page loaded (200); demo sign-in as Ali; a fresh glue-gun request → AI asked one question → a valid plan of 2 fictional owners, Free, with Wed 11 Nov 5:00 PM pickup and Thu 12 Nov 5:00 PM return; labels "AI demo results — fictional", "Demo item", "Simulated owner", "(simulated)" visible; sent and simulated yes → "All 5 confirmed"; booking chat showed Make it rhyme with Urdu / Roman Urdu / English and Friendly / Funny and produced a two-line Roman Urdu rhyme with plain meaning (not sent); refreshing the booking page kept it open; sign-out left no saved private data and reopening the booking sent the visitor to sign-in. No page errors. The demo was reset afterwards.
 
-**Untested:** email delivery of sign-up/reset emails (test members were created directly); install, GPS and fonts on a physical phone.
+**Reported from earlier passes (10–11 Nov 2026, not repeated now):**
+- Full 5-glue-gun run with decline, replacement, pickup, partial return, final return, thank-you rhymes and ratings; 20-chair split with a decline and replacement.
+- Normal (non-demo) members: listing with photo, edit, pause, request with an AI question, yes, chat, meeting, pickup, return, both ratings; normal members saw no demo data.
+- Two borrowers racing for the last item: exactly one booked.
+- Shayari in the chat (Urdu, phone-size screen), faraway note (private details hidden in the source, rhyme, meaning, owner view and notifications) and thank-you card (Roman Urdu and English).
+- Network: offline send and reconnect, lost reply, stalled send stops after 20 s with retry, drafts survive reload, sign-out clears saved typing.
+- Phone-size layouts in a desktop browser at 320, 360 and 390 px.
+- Permissions: no access to other people's messages or photos; members cannot make themselves admin, change demo flags, create fictional inventory, use presenter buttons or reset the demo; the demo admin cannot see real members' reports.
+
+**Simulated, not real:** fictional owners and their taps (presenter buttons); AI timeout / no-balance / bad-answer / interrupted-save were forced with a demo-only test switch.
+
+**Untested:** delivery of sign-up and password-reset emails in this copy; installing the app, GPS, keyboard behaviour and Urdu font rendering on a physical phone.
 
 ## 11. Known limitations
 
-- No in-app payments (payment is only reported), no phone lock-screen notifications, no branded email domain.
-- One community (Multan); identity check uses a test number in this MVP.
-- Physical-phone install/GPS/font checks are pending.
-- GitHub is not connected; the project owner must connect it in Lovable (Connectors → GitHub). Lovable then syncs the code automatically.
+- No in-app payments (payment is only reported), no phone lock-screen notifications, no branded email domain (sign-up email has a link, not a typed code).
+- One community (Multan); identity uses a clearly labelled test number, not a real check.
+- Live updates refresh every few seconds rather than instantly.
+- Distances are straight-line estimates.
+- Physical-phone checks are pending (see README "Physical-phone checklist").
