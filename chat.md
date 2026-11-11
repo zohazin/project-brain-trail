@@ -26,6 +26,7 @@ Central reference for project context. Read this first in every session; update 
 - Tested (passed): AI failure screens (simulated), real retry/reuse, two-borrower race, full 5-glue-gun run with decline/replacement/partial return/thank-you/ratings, normal-member listing→booking→ratings, search edits, Shayari DM (Urdu, phone)/faraway (privacy)/thank-you, no rhyme reuse or duplicates, offline/lost-reply/stalled/draft/missed-alert/closed-chat/sign-out, repeat taps on pickup/return/cancel, layouts 320/360/390/1280, reset + permissions (incl. demo admin vs real reports, member reset blocked). 119/119 automatic tests.
 - Submission files: `docs/MVP.md` (no official example was available), README (setup, demo, three-minute script, Q&A, physical-phone checklist).
 - Test members kept (normal accounts, not demo): final-check-lender / final-check-borrower @cheezudhaar.test with one finished drill booking.
+- **Republished 11 Nov 2026** at https://project-brain-trail.lovable.app: checked live (loads, demo sign-in, Find at 320 px, new fixes present).
 - Still open: GitHub not connected (owner must connect in Lovable → Connectors → GitHub); email delivery untested; physical-phone install/GPS/fonts pending.
 
 ## AI demo results (input9218.txt; request7618.txt re-sent 3×) — built 2026-11-10

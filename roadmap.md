@@ -107,5 +107,5 @@
 - [x] I. Demo reset + permissions: reset restores 7 demo people/10 items, removes fictional owners/listings/rhymes, keeps real members; a reset during AI creation now leaves nothing behind (fixed); demo area admin cannot see or decide real reports; no self-admin; members cannot reset or prepare the demo
 - [x] J. MVP document (`docs/MVP.md`) + README; GitHub not connected (owner action)
 - [x] K. Three-minute demo script + Q&A + phone checklist (README)
-- [ ] L. Publish + live smoke test
-- [ ] M. Final handoff
+- [x] L. Published 11 Nov 2026; live check: page loads (200), install file standalone, demo sign-in → Find works at 320 px with no sideways scroll, AI demo switch/reset/Shayari demo present, new listing-hours and header fixes in live files
+- [x] M. Final handoff given. Next action: connect GitHub (owner), run the real-phone checklist in README
