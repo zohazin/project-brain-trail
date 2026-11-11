@@ -121,3 +121,5 @@
 - [x] 6. Handoff
 - [ ] Organizer accepts GitHub invitation — waiting on organizer
 - [ ] Fill placeholders and submit the form once — submitting member only
+
+- [ ] Hide the Lovable badge on the live site — blocked: needs a Pro plan, then the Hide badge setting

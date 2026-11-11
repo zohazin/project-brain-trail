@@ -20,6 +20,13 @@ Central reference for project context. Read this first in every session; update 
 - Not tested in this copy: email delivery, real phone install/GPS. (Shayari live tests and the Find chair walkthrough were done 2026-11-10 — see "AI billing check" below.)
 - **Published 2026-11-10: https://project-brain-trail.lovable.app** (returned 200 with the Cheez Udhaar title).
 
+## Remove Lovable badge request (task4920.txt, 2026-11-11)
+- Request: remove every Lovable badge/branding and add CSS hiding `#lovable-badge`. Reported `src/pages/NotFound.tsx(7,11)` error: file does not exist here; not applicable.
+- Checked: the app's own pages, footer, titles and share tags contain **no** Lovable name or link (author = "Cheez Udhaar"). The only branding on the live site is the "Edit with Lovable" badge that hosting adds on publish.
+- Workspace is on the **Free plan**; hiding the badge is a paid-plan setting (Pro or higher). The CSS cover-up was **not added** (it would get around a paid setting). Badge currently shown.
+- User-only: upgrade to Pro, then Project settings → General → "Hide 'Lovable' Badge" (or ask the AI to switch it off); then republish.
+- Behind-the-scenes build tools and error reporting keep the Lovable name in code only; nothing visible, removing them would break the app.
+
 ## Hackathon submission pass (query7663.txt, 2026-11-11)
 - Task: finalize Cheez Udhaar for **TECHSoc Hackathon 2026**. Reported `src/App.tsx(14,22)` error: file does not exist here; not applicable (the spec says it is a feature task). User authorised publishing tested fixes.
 - **GitHub: connected and synced** — https://github.com/zohazin/project-brain-trail (private, branch `main`). Checked through a GitHub data connection (chat-only, not linked to the app): latest commit on GitHub = latest local commit; all tracked files present (source, server code, 15 migration files, `bun.lock`, README, docs/MVP.md, docs/SUBMISSION.md, `.env.example`). Tracked `.env` holds only public browser keys; no secrets found in tracked files; a throwaway test email was removed from chat.md.
@@ -250,6 +257,7 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 | lovable-36845aad-2026-11-10.zip | Full export of the original Cheez Udhaar project; imported into this project 2026-11-10 |
 | query5371.txt | Instruction: import the whole zip 100% (plus a NotFound.tsx error line that doesn't apply) |
 | query7663.txt | Hackathon submission pass: verify GitHub, finalize MVP doc, SUBMISSION.md answers, live smoke test, judge demo, handoff |
+| task4920.txt | Remove Lovable badge/branding (blocked: Free plan) |
 | docs/SUBMISSION.md | Ready-to-copy submission form answers + checklist |
 | request7618.txt | Fix AI 402 billing blocker (check workspace, move only if needed), live check, four live Shayari/Find tests, publish, hand off |
 
