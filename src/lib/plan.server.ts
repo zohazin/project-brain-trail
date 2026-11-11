@@ -24,6 +24,25 @@ export async function signPaths(paths: (string | null | undefined)[]): Promise<R
   return out;
 }
 
+/**
+ * Illustrative stock photo keys for trial/demo listings that have no uploaded photo, chosen from the listing's own
+ * name and details. Real members' listings and any listing with a real photo get none. Only call with item ids the
+ * caller was already allowed to see (from the matching / nearby / listing RPCs).
+ */
+export async function samplePhotoKeysFor(ids: string[]): Promise<Record<string, string>> {
+  const list = Array.from(new Set(ids.filter(Boolean)));
+  if (list.length === 0) return {};
+  const { samplePhotoKey } = await import("./sample-photos");
+  const sb = await admin();
+  const { data } = await sb.from("items").select("id, name, description, specs, photo_path, is_demo").in("id", list).eq("is_demo", true).is("photo_path", null);
+  const out: Record<string, string> = {};
+  for (const it of data ?? []) {
+    const key = samplePhotoKey(it.name, `${it.specs ?? ""} ${it.description ?? ""}`);
+    if (key) out[it.id] = key;
+  }
+  return out;
+}
+
 /** Makes sure each item has a fresh private AI summary. */
 export async function refreshItemSummary(itemId: string) {
   const sb = await admin();
@@ -219,7 +238,16 @@ export async function buildPlan(want: Want, km: number): Promise<Plan> {
   base.explanation = explainPlan(base, (want.item_name ?? "items").toLowerCase(), want.unit);
   base.checks = stillToCheck(base.lines, cands);
   await markGenerated(db, [...base.lines, ...base.exceptions], base, want.id);
+  await markSamplePhotos([...base.lines, ...base.exceptions]);
   return base;
+}
+
+/** Trial/demo listings without their own photo get a labelled illustrative stock photo. */
+async function markSamplePhotos(lines: PlanLine[]) {
+  const need = lines.filter((l) => !l.photo_url);
+  if (need.length === 0) return;
+  const keys = await samplePhotoKeysFor(need.map((l) => l.item_id));
+  for (const l of need) if (keys[l.item_id]) l.sample_photo = keys[l.item_id];
 }
 
 /** Labels fictional AI demo listings so they are never shown as real neighbours. */

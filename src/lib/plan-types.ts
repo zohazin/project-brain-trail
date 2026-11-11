@@ -20,6 +20,8 @@ export type PlanLine = {
   unconfirmed?: string[] | undefined;
   measured?: boolean | undefined;
   photo_url: string | null;
+  /** Illustrative stock photo key (trial/demo listings without their own photo only). */
+  sample_photo?: string | undefined;
   avg_rating: number | null;
   rating_count: number;
   condition?: string;

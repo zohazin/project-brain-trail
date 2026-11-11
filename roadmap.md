@@ -132,10 +132,11 @@
 - [x] Phone-width end-to-end test, tests, publish
 - [ ] Real-phone check — needs a physical phone
 
-## Trial item photos (hub_prompt3085.txt) — in progress
-- [ ] Add licensed, relevant photos to existing and newly created trial listings; preserve real uploads
-- [ ] Show “Trial data” + “Illustrative photo”, consistent lazy-loaded images and failure fallback everywhere
-- [ ] Backfill existing trial listings, test browsing/search/details, publish
+## Trial item photos (hub_prompt3085.txt = context1542.txt) — done 2026-11-11 (built in the copy project, pushed here)
+- [x] Add licensed, relevant photos to existing and newly created trial listings; preserve real uploads
+- [x] Show “Trial data” + “Illustrative photo”, consistent lazy-loaded images and failure fallback everywhere
+- [x] Backfill existing trial listings, test browsing/search/details
+- [ ] Publish this project (project-brain-trail.lovable.app) so the live site gets the photos
 
 ## Latest requests (prompt8236.txt, instruction3614.txt) — in progress
 - [ ] Read and fold the new instructions into the current work
@@ -143,3 +144,7 @@
 ## Project source download — 2026-11-11 — done
 - [x] Package the current source, tests, database steps and documentation without secrets, dependencies, repository metadata or build output
 - [x] Inspect the archive and provide it as a download
+
+## Hide hosting badge (task2483.txt) — done 2026-11-11 (pushed here)
+- [x] Style rule hiding the whole `#lovable-badge` widget (box, text and close X) on every page
+- [ ] Turning the badge off in Project settings needs a Pro plan or higher

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DistancePicker } from "@/components/app/DistancePicker";
-import { AiNotice, Card, ItemThumb, Pill, Stars, requestStatusWords, statusTone } from "@/components/app/bits";
+import { AiNotice, Card, IllustrativeTag, ItemThumb, Pill, Stars, requestStatusWords, statusTone } from "@/components/app/bits";
 import { applyQuantityChange, autoAcceptSimulated, cancelBooking, cleanNote, planForWant, talkNeed } from "@/lib/app.functions";
 import { errMessage, profileQuery, wantQuery } from "@/lib/queries";
 import { coverageLine, fmtDateTime, fmtDistance, fmtQty, money, priceLabel } from "@/lib/format";
@@ -19,6 +19,7 @@ import { QuoteBox, type QuoteRow } from "@/components/app/Quote";
 import type { Plan, PlanLine } from "@/lib/plan-types";
 import type { ChangePreview } from "@/lib/change";
 import { ensureOnline, useDraft } from "@/hooks/use-app";
+import { samplePhotoByKey } from "@/lib/sample-photos";
 import { AiDemoLabel, DemoIntro, DemoMaker, DemoPlanBanner, SAMPLE_PHOTO_TEXT, SimOwnerActions, SimulatedOwnerLabel, TrialBadge } from "@/components/app/DemoResults";
 import { TryTrialButton } from "@/components/app/Trial";
 import { demoMatches } from "@/lib/app.functions";
@@ -527,11 +528,13 @@ function FitAndChecks({ plan }: { plan: Plan }) {
 }
 
 function PlanRow({ line, trial }: { line: PlanLine; trial?: boolean }) {
+  const sample = samplePhotoByKey(line.sample_photo);
   return (
     <li className="flex items-center gap-3 py-3">
-      <ItemThumb url={line.photo_url} name={line.item_name} className="h-16 w-16 shrink-0" emptyText={line.generated ? SAMPLE_PHOTO_TEXT : undefined} />
+      <ItemThumb url={line.photo_url} name={line.item_name} className="h-16 w-16 shrink-0" sample={sample} tag="none" emptyText={line.generated ? SAMPLE_PHOTO_TEXT : undefined} />
       <div className="min-w-0 flex-1">
         {line.generated ? <AiDemoLabel className="mb-1" /> : trial ? <div className="mb-1"><TrialBadge /></div> : null}
+        {sample && !line.photo_url && <IllustrativeTag className="mb-1" />}
         <p className="font-semibold">
           {line.label} · {fmtQty(line.quantity, line.unit)} {line.unit === "item" ? line.item_name.toLowerCase() : `of ${line.item_name.toLowerCase()}`}
         </p>

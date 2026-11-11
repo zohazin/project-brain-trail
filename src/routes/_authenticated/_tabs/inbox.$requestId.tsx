@@ -27,7 +27,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Card, ItemThumb, Pill, requestStatusWords, statusTone } from "@/components/app/bits";
+import { Card, IllustrativeTag, ItemThumb, Pill, requestStatusWords, statusTone } from "@/components/app/bits";
+import { samplePhotoByKey } from "@/lib/sample-photos";
 import { cancelBooking, reportPhoto, requestPhotos } from "@/lib/app.functions";
 import { dateChangesQuery, errMessage, profileQuery, requestQuery, type RequestBundle } from "@/lib/queries";
 import { DAY_RULE, fmtDateTime, fmtQty, fmtShort, isoToLocalInput, localInputToIso, money, priceLabel, quoteLine } from "@/lib/format";
@@ -111,6 +112,7 @@ function Booking() {
   const otherName = iAmOwner ? (r.borrower_name ?? "The borrower") : r.owner_name;
   const otherPhoto = photos.data?.people?.[requestId]?.[otherId] ?? null;
   const active = r.status === "confirmed" || r.status === "completed";
+  const itemSample = samplePhotoByKey(photos.data?.samples?.[requestId]);
 
   return (
     <div className="space-y-5">
@@ -119,8 +121,9 @@ function Booking() {
       </Link>
       <Card id="summary" className="space-y-3">
         <div className="flex gap-4">
-          <ItemThumb url={photos.data?.items?.[requestId]} name={r.item_name} className="h-24 w-24 shrink-0" emptyText={r.simulated ? SAMPLE_PHOTO_TEXT : undefined} />
+          <ItemThumb url={photos.data?.items?.[requestId]} name={r.item_name} className="h-24 w-24 shrink-0" sample={itemSample} tag="none" emptyText={r.simulated ? SAMPLE_PHOTO_TEXT : undefined} />
           <div className="min-w-0 flex-1 space-y-1">
+            {itemSample && !photos.data?.items?.[requestId] && <IllustrativeTag />}
             {r.simulated && (
               <div className="flex flex-wrap gap-1">
                 <AiDemoLabel />

@@ -197,3 +197,11 @@
     scroll-margin-bottom: 7rem;
   }
 }
+
+/* Hide the hosting badge widget completely (container, text and close button). */
+#lovable-badge,
+#lovable-badge * {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

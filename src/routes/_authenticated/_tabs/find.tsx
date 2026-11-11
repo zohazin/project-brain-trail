@@ -12,6 +12,7 @@ import { MyItemsPanel } from "@/components/app/MyItemsPanel";
 import { InstallBanner } from "@/components/app/InstallApp";
 import { AiNotice, Card, Empty, ItemThumb, Stars } from "@/components/app/bits";
 import { AiDemoLabel, TrialBadge, SAMPLE_PHOTO_TEXT } from "@/components/app/DemoResults";
+import { samplePhotoByKey } from "@/lib/sample-photos";
 import { getAiStatus, nearbyItems, talkNeed } from "@/lib/app.functions";
 import { profileQuery, errMessage } from "@/lib/queries";
 import { fmtDateTime, fmtDistance, fmtQty, localInputToIso, priceLabel } from "@/lib/format";
@@ -317,7 +318,7 @@ function FindPage() {
               <li key={it.item_id}>
                 <Link to="/listing/$itemId" params={{ itemId: it.item_id }} className="block h-full">
                   <Card className="h-full p-3 transition-colors hover:bg-accent">
-                    <ItemThumb url={it.photo_url} name={it.item_name} className="w-full" emptyText={it.is_generated ? SAMPLE_PHOTO_TEXT : undefined} />
+                    <ItemThumb url={it.photo_url} name={it.item_name} className="w-full" sample={samplePhotoByKey(it.sample_photo)} emptyText={it.is_generated ? SAMPLE_PHOTO_TEXT : undefined} />
                     {it.is_generated ? <AiDemoLabel className="mt-2" /> : profile.is_demo ? <div className="mt-2"><TrialBadge /></div> : null}
                     <h3 className="mt-2 text-base font-semibold leading-tight">{it.item_name}</h3>
                     <p className="text-sm text-muted-foreground">

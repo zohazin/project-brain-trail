@@ -1,16 +1,77 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { AlertTriangle, Package, RotateCw, Star } from "lucide-react";
+import { AlertTriangle, ImageIcon, Package, RotateCw, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ILLUSTRATIVE_LABEL, type SamplePhoto } from "@/lib/sample-photos";
 
-export function ItemThumb({ url, name, className, emptyText }: { url: string | null | undefined; name: string; className?: string; emptyText?: string | undefined }) {
-  if (url) {
-    return <img src={url} alt={name} className={cn("aspect-square rounded-xl object-cover", className)} loading="lazy" />;
+/** Small "Illustrative photo" tag: shown on every stock photo used for a trial/demo listing without its own photo. */
+export function IllustrativeTag({ className }: { className?: string }) {
+  return (
+    <span className={cn("inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 text-xs font-semibold text-muted-foreground", className)}>
+      <ImageIcon className="h-3 w-3" aria-hidden /> {ILLUSTRATIVE_LABEL}
+    </span>
+  );
+}
+
+/**
+ * Item picture. Order: the owner's own photo → an illustrative stock photo (trial/demo only, always labelled) → plain placeholder.
+ * Every image is lazy-loaded, square-cropped for phones, and falls back to the placeholder if it fails to load.
+ */
+export function ItemThumb({
+  url,
+  name,
+  className,
+  emptyText,
+  sample,
+  tag = "overlay",
+}: {
+  url: string | null | undefined;
+  name: string;
+  className?: string;
+  emptyText?: string | undefined;
+  sample?: SamplePhoto | null | undefined;
+  /** "overlay": label on the photo; "none": the caller shows <IllustrativeTag /> itself (small thumbnails). */
+  tag?: "overlay" | "none";
+}) {
+  const [failed, setFailed] = useState<string | null>(null);
+  const realUrl = url && failed !== url ? url : null;
+  const sampleUrl = !url && sample && failed !== sample.url ? sample.url : null;
+  if (realUrl) {
+    return (
+      <img
+        src={realUrl}
+        alt={name}
+        width={640}
+        height={640}
+        className={cn("aspect-square rounded-xl bg-secondary object-cover", className)}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(realUrl)}
+      />
+    );
   }
-  if (emptyText) {
+  if (sampleUrl && sample) {
+    return (
+      <div className={cn("relative aspect-square overflow-hidden rounded-xl bg-secondary", className)}>
+        <img
+          src={sampleUrl}
+          alt={`${ILLUSTRATIVE_LABEL} of ${sample.subject}${name ? ` for “${name}”` : ""}`}
+          width={640}
+          height={640}
+          className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(sampleUrl)}
+        />
+        {tag === "overlay" && <IllustrativeTag className="absolute bottom-1.5 left-1.5 bg-card/90 px-1.5 text-[11px] shadow-sm" />}
+      </div>
+    );
+  }
+  const text = (url || sample) && !emptyText ? "Photo unavailable" : emptyText;
+  if (text) {
     return (
       <div className={cn("flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-secondary p-1 text-center text-secondary-foreground", className)}>
         <Package className="h-1/3 w-1/3 opacity-60" aria-hidden />
-        <span className="text-[11px] font-semibold leading-tight [overflow-wrap:anywhere]">{emptyText}</span>
+        <span className="text-[11px] font-semibold leading-tight [overflow-wrap:anywhere]">{text}</span>
       </div>
     );
   }

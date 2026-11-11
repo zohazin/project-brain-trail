@@ -585,7 +585,7 @@ export const nearbyItems = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { signPaths } = await import("./plan.server");
+    const { signPaths, samplePhotoKeysFor } = await import("./plan.server");
     // Without dates only the listed amount is known; with dates the database checks that exact interval.
     const r = await context.supabase.rpc("nearby_items", {
       _km: data.km,
@@ -598,9 +598,11 @@ export const nearbyItems = createServerFn({ method: "POST" })
     const ids = (r.data ?? []).map((x) => x.item_id);
     const gen = ids.length ? await context.supabase.rpc("generated_item_ids", { _ids: ids }) : { data: [] as string[] };
     const generated = new Set((gen.data ?? []) as string[]);
+    const samples = await samplePhotoKeysFor((r.data ?? []).filter((x) => !x.photo_path).map((x) => x.item_id));
     return (r.data ?? []).map((x) => ({
       ...x,
       is_generated: generated.has(x.item_id),
+      sample_photo: samples[x.item_id] ?? null,
       listed_qty: Number(x.listed_qty),
       free_qty: x.free_qty == null ? null : Number(x.free_qty),
       time_note: x.time_note ?? null,
@@ -616,15 +618,18 @@ export const requestPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ requestIds: z.array(z.string().uuid()).max(100) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { signPaths } = await import("./plan.server");
+    const { signPaths, samplePhotoKeysFor } = await import("./plan.server");
     type CondPhoto = { url: string; stage: string; mine: boolean; at: string };
-    if (data.requestIds.length === 0) return { items: {}, people: {}, condition: {} as Record<string, CondPhoto[]> };
+    if (data.requestIds.length === 0) return { items: {}, samples: {} as Record<string, string>, people: {}, condition: {} as Record<string, CondPhoto[]> };
     // RLS: only requests where the caller is a party come back.
     const { data: reqs } = await context.supabase
       .from("requests")
-      .select("id, item_photo, borrower_id, owner_id, status, condition_photos")
+      .select("id, item_id, item_photo, borrower_id, owner_id, status, condition_photos")
       .in("id", data.requestIds);
     const list = reqs ?? [];
+    const sampleByItem = await samplePhotoKeysFor(list.filter((r) => !r.item_photo).map((r) => r.item_id));
+    const samples: Record<string, string> = {};
+    for (const r of list) if (!r.item_photo && sampleByItem[r.item_id]) samples[r.id] = sampleByItem[r.item_id]!;
     const { data: choices } = await context.supabase
       .from("request_photos")
       .select("*")
@@ -657,7 +662,7 @@ export const requestPhotos = createServerFn({ method: "POST" })
         .filter((c) => urls[c.path])
         .map((c) => ({ url: urls[c.path]!, stage: c.stage, mine: c.by === context.userId, at: c.at }));
     }
-    return { items, people, condition };
+    return { items, samples, people, condition };
   });
 
 export const reportPhoto = createServerFn({ method: "POST" })
@@ -699,15 +704,17 @@ export const listingDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ itemId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { signPaths } = await import("./plan.server");
+    const { signPaths, samplePhotoKeysFor } = await import("./plan.server");
     const r = await context.supabase.rpc("listing_detail", { _item: data.itemId });
     if (r.error) throw new Error(r.error.message);
     const it = (r.data ?? [])[0];
     if (!it) return null;
     const urls = await signPaths(it.photo_paths ?? []);
     const gen = await context.supabase.rpc("generated_item_ids", { _ids: [data.itemId] });
+    const samples = (it.photo_paths ?? []).length ? {} : await samplePhotoKeysFor([data.itemId]);
     return {
       ...it,
+      sample_photo: samples[data.itemId] ?? null,
       is_generated: ((gen.data ?? []) as string[]).includes(data.itemId),
       price_rs: Number(it.price_rs),
       price_per: Number(it.price_per),

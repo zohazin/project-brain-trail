@@ -1,10 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, CalendarClock, MapPin, Package, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, Empty, ItemThumb, Stars } from "@/components/app/bits";
-import { AiDemoLabel, SAMPLE_PHOTO_TEXT, SimulatedOwnerLabel } from "@/components/app/DemoResults";
+import { profileQuery } from "@/lib/queries";
+import { samplePhotoByKey, type SamplePhoto } from "@/lib/sample-photos";
+import { AiDemoLabel, SAMPLE_PHOTO_TEXT, SimulatedOwnerLabel, TrialBadge } from "@/components/app/DemoResults";
 import { DirectRequest } from "@/components/app/DirectRequest";
 import { listingDetail } from "@/lib/app.functions";
 import { DAY_NAMES, fmtClock, fmtDistance, fmtQty, priceLabel } from "@/lib/format";
@@ -31,6 +33,7 @@ function Listing() {
   const { data: it } = useSuspenseQuery(listingQuery(itemId));
   const navigate = useNavigate();
   const [shown, setShown] = useState(0);
+  const profile = useQuery(profileQuery(userId));
 
   if (!it) {
     return (
@@ -58,6 +61,7 @@ function Listing() {
     navigate({ to: "/find" });
   }
 
+  const sample = samplePhotoByKey(it.sample_photo);
   const days = it.avail_days.length === 7 ? "Every day" : it.avail_days.map((d) => DAY_NAMES[d]).join(", ");
   return (
     <div className="space-y-4">
@@ -65,7 +69,8 @@ function Listing() {
       <Card className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-[minmax(0,16rem)_1fr]">
           <div className="space-y-2">
-            <ItemThumb url={it.photo_urls[shown] ?? null} name={it.item_name} className="w-full" emptyText={it.is_generated ? SAMPLE_PHOTO_TEXT : undefined} />
+            <ItemThumb url={it.photo_urls[shown] ?? null} name={it.item_name} className="w-full" sample={sample} emptyText={it.is_generated ? SAMPLE_PHOTO_TEXT : undefined} />
+            {sample && it.photo_urls.length === 0 && <PhotoCredit photo={sample} />}
             {it.photo_urls.length > 1 && (
               <div className="flex gap-2" role="group" aria-label="More photos">
                 {it.photo_urls.map((u, i) => (
@@ -78,12 +83,16 @@ function Listing() {
           </div>
           <div className="min-w-0 space-y-2">
             {it.category && <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{it.category}</p>}
-            {it.is_generated && (
+            {it.is_generated ? (
               <div className="flex flex-wrap gap-1">
                 <AiDemoLabel />
                 <SimulatedOwnerLabel />
               </div>
-            )}
+            ) : profile.data?.is_demo ? (
+              <div className="flex flex-wrap gap-1">
+                <TrialBadge />
+              </div>
+            ) : null}
             <h1 className="text-2xl font-bold">{it.item_name}</h1>
             <p className="text-xl font-semibold text-primary">{priceLabel(it.kind, it.price_rs, it.price_per, it.unit, it.price_period, it.listed_qty)}</p>
             <Stars avg={it.avg_rating} count={it.rating_count} />
@@ -152,5 +161,27 @@ function BackToFind() {
     <Link to="/find" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
       <ArrowLeft className="h-4 w-4" aria-hidden /> Back to Find
     </Link>
+  );
+}
+
+/** Who took the illustrative photo and under which licence (needed for the free licences). */
+function PhotoCredit({ photo }: { photo: SamplePhoto }) {
+  const c = photo.credit;
+  return (
+    <p className="text-xs text-muted-foreground">
+      Illustrative photo, not the owner's item. Photo:{" "}
+      <a href={c.source} target="_blank" rel="noreferrer" className="underline">
+        {c.author || "Wikimedia Commons"}
+      </a>
+      {", "}
+      {c.licenseUrl ? (
+        <a href={c.licenseUrl} target="_blank" rel="noreferrer" className="underline">
+          {c.license}
+        </a>
+      ) : (
+        c.license
+      )}
+      , via Wikimedia Commons.
+    </p>
   );
 }
