@@ -20,6 +20,16 @@ Central reference for project context. Read this first in every session; update 
 - Not tested in this copy: email delivery, real phone install/GPS. (Shayari live tests and the Find chair walkthrough were done 2026-11-10 — see "AI billing check" below.)
 - **Published 2026-11-10: https://project-brain-trail.lovable.app** (returned 200 with the Cheez Udhaar title).
 
+## Hackathon submission pass (query7663.txt, 2026-11-11)
+- Task: finalize Cheez Udhaar for **TECHSoc Hackathon 2026**. Reported `src/App.tsx(14,22)` error: file does not exist here; not applicable (the spec says it is a feature task). User authorised publishing tested fixes.
+- **GitHub: connected and synced** — https://github.com/zohazin/project-brain-trail (private, branch `main`). Checked through a GitHub data connection (chat-only, not linked to the app): latest commit on GitHub = latest local commit; all tracked files present (source, server code, 15 migration files, `bun.lock`, README, docs/MVP.md, docs/SUBMISSION.md, `.env.example`). Tracked `.env` holds only public browser keys; no secrets found in tracked files; a throwaway test email was removed from chat.md.
+- Collaborator invitation to `techsochackathon-creator` (write access, sent 11 Nov 00:45 UTC): **pending** (not accepted yet, not expired). Only zohazin has access now.
+- Submission form https://forms.gle/Wz1n43ZNJq3XoP2Y7 needs Google sign-in → questions unreadable; general answer pack made in `docs/SUBMISSION.md` with placeholders for Team ID, names, roll numbers, contacts. **Do not submit for the user**; one member submits once. Deadline "tomorrow 9:00 AM" — date unverified.
+- `docs/MVP.md` rewritten (links, workflow, AI role, rules, fictional demo, Card 2, setup, 3-minute demo, tests split into "run today" vs "earlier", limitations). README: Links section, judge access note (demo password public on purpose, demo accounts restricted).
+- Live smoke test of the published app (11 Nov, fresh browser): loads 200; Ali demo sign-in; fresh 5 glue-gun request → one AI question → 2 fictional owners, Free, Wed 11 Nov 5 PM → Thu 12 Nov 5 PM; fictional labels visible; simulated yes → "All 5 confirmed"; chat Make it rhyme (Urdu/Roman Urdu/English, Friendly/Funny) made a two-line Roman Urdu rhyme + meaning (not sent); booking refresh OK; sign-out cleared device data and the booking needs sign-in again. No page errors. **No release-blocking bugs → no app code changed, no republish needed.** Demo reset afterwards (7 demo people, 0 fictional items; only the normal-member drill booking remains).
+- 119/119 automatic tests.
+- User-only: organizer must accept the invitation; fill placeholders and submit the form once; real-phone checklist.
+
 ## Final MVP readiness pass (instruction9187.txt, 2026-11-10/11)
 - Reported errors `src/lib/utils.ts(2,6)` / `src/App.tsx` / `src/pages/NotFound.tsx`: those lines don't exist here (utils.ts only has `cn`); not applicable. The attached spec (sections A–M) was the real task; user **authorised publishing** without asking again.
 - Fixes this pass: demo-only AI fault switch `?demoFault=timeout|balance|invalid|save` (real members refused); retries reuse saved results and clean up stale runs; race loser for the last fictional item gets a clear message + replacement; typed distance ("10 km ke andar") now sticks; "free ho to behtar" = preference, not free-only; faraway notes drop leftover "call me on [hidden]" / "[hidden] mein hai" bits; chat sends stop after 20 s with "try again" (no endless Sending…), closed chats explain why and aren't resent; small-phone (320 px) top bar/notifications fixed; reasons shown under greyed-out pickup/return/rating/listing-hours buttons; a demo reset during AI creation leaves nothing behind.
@@ -27,7 +37,7 @@ Central reference for project context. Read this first in every session; update 
 - Submission files: `docs/MVP.md` (no official example was available), README (setup, demo, three-minute script, Q&A, physical-phone checklist).
 - Test members kept (normal accounts, not demo): final-check-lender / final-check-borrower @cheezudhaar.test with one finished drill booking.
 - **Republished 11 Nov 2026** at https://project-brain-trail.lovable.app: checked live (loads, demo sign-in, Find at 320 px, new fixes present).
-- Still open: GitHub not connected (owner must connect in Project settings → Git, or chat + menu → Project → GitHub; the AI cannot connect it or see its status); email delivery untested; physical-phone install/GPS/fonts pending.
+- (Old: GitHub not connected → **now connected**, see "Hackathon submission pass".) Email delivery untested; physical-phone install/GPS/fonts pending.
 
 ## AI demo results (input9218.txt; request7618.txt re-sent 3×) — built 2026-11-10
 - Request: demo accounts get fictional owners/listings created **live by AI** when the demo neighbours don't have enough, fully usable in matching, booking, chat, handover and Shayari; never shown to real members. (The attached "errors" `src/pages/NotFound.tsx` / `src/App.tsx` don't exist in this app — not applicable; the spec itself said it is a feature request.)
@@ -239,6 +249,8 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 | AGENTS.md | Technical rules |
 | lovable-36845aad-2026-11-10.zip | Full export of the original Cheez Udhaar project; imported into this project 2026-11-10 |
 | query5371.txt | Instruction: import the whole zip 100% (plus a NotFound.tsx error line that doesn't apply) |
+| query7663.txt | Hackathon submission pass: verify GitHub, finalize MVP doc, SUBMISSION.md answers, live smoke test, judge demo, handoff |
+| docs/SUBMISSION.md | Ready-to-copy submission form answers + checklist |
 | request7618.txt | Fix AI 402 billing blocker (check workspace, move only if needed), live check, four live Shayari/Find tests, publish, hand off |
 
 ## Change History
@@ -257,5 +269,5 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 
 ## GitHub sync request (2026-11-11)
 - User asked to connect GitHub and confirm sync. Reported error `src/App.tsx(17,16) TS2554`: file does not exist here; not applicable.
-- The AI cannot connect Git sync or read its status. Waiting on the owner to connect (Project settings → Git → Connect; creates a NEW private repo; only the synced branch, usually `main`, syncs both ways).
+- (Old status, now resolved — see "Hackathon submission pass".) The AI cannot connect Git sync. Waiting on the owner to connect (Project settings → Git → Connect; creates a NEW private repo; only the synced branch, usually `main`, syncs both ways).
 - How to confirm: after connecting, the repo's latest commit should match the latest Lovable commit; next AI edit should appear in GitHub within moments. Optionally the AI can read the repo via a GitHub data connection to compare commits.

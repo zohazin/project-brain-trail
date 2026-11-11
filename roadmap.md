@@ -110,4 +110,14 @@
 - [x] L. Published 11 Nov 2026; live check: page loads (200), install file standalone, demo sign-in → Find works at 320 px with no sideways scroll, AI demo switch/reset/Shayari demo present, new listing-hours and header fixes in live files
 - [x] M. Final handoff given. Next action: connect GitHub (owner), run the real-phone checklist in README
 
-- [ ] Connect GitHub sync and confirm a commit arrives — blocked: owner must connect in Project settings → Git
+- [x] Connect GitHub sync and confirm a commit arrives — connected by owner; GitHub latest commit matches local (11 Nov)
+
+## Hackathon submission pass (query7663.txt) — 2026-11-11
+- [x] 1. Repository verified on GitHub (all files, migrations, lockfile, docs); no secrets; links added
+- [x] 2. docs/MVP.md finalized
+- [x] 3. docs/SUBMISSION.md (form needs Google sign-in; general answers + placeholders)
+- [x] 4. Live smoke test passed; no fixes needed; demo reset
+- [x] 5. Judge demo instructions + 3-minute sequence
+- [x] 6. Handoff
+- [ ] Organizer accepts GitHub invitation — waiting on organizer
+- [ ] Fill placeholders and submit the form once — submitting member only
