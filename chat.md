@@ -293,3 +293,10 @@ Desktop browser (1280 px) and phone emulation (360/390 px) on the local preview;
 - (Old status, now resolved — see "Hackathon submission pass".) The AI cannot connect Git sync. Waiting on the owner to connect (Project settings → Git → Connect; creates a NEW private repo; only the synced branch, usually `main`, syncs both ways).
 - How to confirm: after connecting, the repo's latest commit should match the latest Lovable commit; next AI edit should appear in GitHub within moments. Optionally the AI can read the repo via a GitHub data connection to compare commits.
 - 2026-11-11: request5940.txt — trial mode and AI demo lenders built, tested end-to-end and published (see section above).
+
+## Project source download (2026-11-11)
+- User asked for a download of this project. Reported `src/pages/Index.tsx(7,24) TS2304 'theme'`: **not applicable** — this TanStack Start project has no `src/pages` folder or `src/pages/Index.tsx`; no app code was changed for that report.
+- Prepared `cheez-udhaar-source-2026-11-11.zip`: 200 source files covering the app, 17 database steps (0000–0016), tests, docs, public icons and `.env.example`.
+- Excluded private `.env`, Git/local workspace metadata, installed dependencies and generated build output. The archive passed its integrity and forbidden-entry checks.
+- The ZIP contains source only: backend records, private uploaded photos and server secrets are not exported. Use the README and `.env.example` when setting up another copy.
+- Files changed for this request: `chat.md`, `roadmap.md`; no application code changed.

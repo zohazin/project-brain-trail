@@ -139,3 +139,7 @@
 
 ## Latest requests (prompt8236.txt, instruction3614.txt) — in progress
 - [ ] Read and fold the new instructions into the current work
+
+## Project source download — 2026-11-11 — done
+- [x] Package the current source, tests, database steps and documentation without secrets, dependencies, repository metadata or build output
+- [x] Inspect the archive and provide it as a download
